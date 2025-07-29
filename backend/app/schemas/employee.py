@@ -26,7 +26,7 @@ class EmployeeBase(BaseModel):
     def validate_tennv(cls, v):
         if not v.strip():
             raise ValueError('Họ tên không được để trống')
-        if not re.match(r'^[\p{L}\s\-]+$', v, re.UNICODE):
+        if not re.match(r'^[a-zA-ZÀ-ỹ\s\-]+$', v):
             raise ValueError('Họ tên chỉ được chứa chữ cái, dấu tiếng Việt và khoảng trắng')
         return v.strip()
 
@@ -54,7 +54,7 @@ class EmployeeBase(BaseModel):
     def validate_parent_name(cls, v):
         if len(v) > 100:
             raise ValueError('Họ tên cha/mẹ không được quá 100 ký tự')
-        if not re.match(r'^[\p{L}\s\-]+$', v, re.UNICODE):
+        if not re.match(r'^[a-zA-ZÀ-ỹ\s\-]+$', v):
             raise ValueError('Họ tên cha/mẹ chỉ được chứa chữ cái')
         return v
 
