@@ -1,8 +1,0 @@
-🌐 Đang khởi động H2 Web Console...
-📡 URL: http://localhost:8082
-🔑 Username: sa
-🔑 Password: (để trống)
-📁 Database: ./qlns_philong
-
-⏹️  Nhấn Ctrl+C để dừng server
-❌ Lỗi: Exception opening port "8082" (port may be in use), cause: "java.net.BindException: Address already in use" [90061-224]

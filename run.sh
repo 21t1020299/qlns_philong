@@ -1,155 +1,268 @@
 #!/bin/bash
 
-# PhiLong - Quản Lý Nhân Sự - Script chạy nhanh
+# PhiLong Employee Management System - Run Script
+# Usage: ./run.sh [command]
 
-echo "🚀 PhiLong - Quản Lý Nhân Sự"
-echo "================================"
+set -e
 
-case "$1" in
-    "compile")
-        echo "📦 Đang compile project..."
-        javac -cp "lib/*:src" -d out src/views/Main.java
-        javac -cp "lib/*:src" -d out src/utils/*.java
-        echo "✅ Compile hoàn thành!"
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_header() {
+    echo -e "${BLUE}================================${NC}"
+    echo -e "${BLUE}  PhiLong Employee Management  ${NC}"
+    echo -e "${BLUE}================================${NC}"
+}
+
+# Check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Check prerequisites
+check_prerequisites() {
+    print_status "Checking prerequisites..."
+    
+    if ! command_exists python3; then
+        print_error "Python 3 is not installed"
+        exit 1
+    fi
+    
+    if ! command_exists node; then
+        print_error "Node.js is not installed"
+        exit 1
+    fi
+    
+    if ! command_exists npm; then
+        print_error "npm is not installed"
+        exit 1
+    fi
+    
+    if ! command_exists docker; then
+        print_warning "Docker is not installed. Some commands may not work."
+    fi
+    
+    if ! command_exists docker-compose; then
+        print_warning "Docker Compose is not installed. Some commands may not work."
+    fi
+    
+    print_status "Prerequisites check completed"
+}
+
+# Install backend dependencies
+install_backend() {
+    print_status "Installing backend dependencies..."
+    cd backend
+    
+    if [ ! -d "venv" ]; then
+        print_status "Creating virtual environment..."
+        python3 -m venv venv
+    fi
+    
+    source venv/bin/activate
+    pip install -r requirements.txt
+    cd ..
+    print_status "Backend dependencies installed"
+}
+
+# Install frontend dependencies
+install_frontend() {
+    print_status "Installing frontend dependencies..."
+    cd frontend
+    npm install
+    cd ..
+    print_status "Frontend dependencies installed"
+}
+
+# Start backend server
+start_backend() {
+    print_status "Starting backend server..."
+    cd backend
+    source venv/bin/activate
+    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+    cd ..
+    print_status "Backend server started on http://localhost:8000"
+}
+
+# Start frontend server
+start_frontend() {
+    print_status "Starting frontend server..."
+    cd frontend
+    npm start &
+    cd ..
+    print_status "Frontend server started on http://localhost:3000"
+}
+
+# Start with Docker
+start_docker() {
+    print_status "Starting with Docker..."
+    docker-compose up -d
+    print_status "Services started with Docker"
+    print_status "Frontend: http://localhost:3000"
+    print_status "Backend: http://localhost:8000"
+    print_status "API Docs: http://localhost:8000/docs"
+}
+
+# Stop Docker services
+stop_docker() {
+    print_status "Stopping Docker services..."
+    docker-compose down
+    print_status "Docker services stopped"
+}
+
+# Build Docker images
+build_docker() {
+    print_status "Building Docker images..."
+    docker-compose build
+    print_status "Docker images built"
+}
+
+# Show logs
+show_logs() {
+    print_status "Showing logs..."
+    docker-compose logs -f
+}
+
+# Clean up
+cleanup() {
+    print_status "Cleaning up..."
+    
+    # Stop any running processes
+    pkill -f "uvicorn" 2>/dev/null || true
+    pkill -f "npm start" 2>/dev/null || true
+    
+    # Remove virtual environment
+    if [ -d "backend/venv" ]; then
+        rm -rf backend/venv
+        print_status "Virtual environment removed"
+    fi
+    
+    # Remove node_modules
+    if [ -d "frontend/node_modules" ]; then
+        rm -rf frontend/node_modules
+        print_status "node_modules removed"
+    fi
+    
+    # Stop and remove Docker containers
+    if command_exists docker-compose; then
+        docker-compose down -v 2>/dev/null || true
+        print_status "Docker containers and volumes removed"
+    fi
+    
+    print_status "Cleanup completed"
+}
+
+# Show status
+show_status() {
+    print_status "Checking service status..."
+    
+    # Check backend
+    if curl -s http://localhost:8000/health >/dev/null 2>&1; then
+        print_status "Backend: Running (http://localhost:8000)"
+    else
+        print_warning "Backend: Not running"
+    fi
+    
+    # Check frontend
+    if curl -s http://localhost:3000 >/dev/null 2>&1; then
+        print_status "Frontend: Running (http://localhost:3000)"
+    else
+        print_warning "Frontend: Not running"
+    fi
+    
+    # Check Docker containers
+    if command_exists docker; then
+        if docker ps --filter "name=philong" --format "table {{.Names}}\t{{.Status}}" 2>/dev/null | grep -q philong; then
+            print_status "Docker containers:"
+            docker ps --filter "name=philong" --format "table {{.Names}}\t{{.Status}}"
+        else
+            print_warning "No Docker containers running"
+        fi
+    fi
+}
+
+# Show help
+show_help() {
+    print_header
+    echo "Usage: ./run.sh [command]"
+    echo ""
+    echo "Commands:"
+    echo "  install     Install all dependencies"
+    echo "  start       Start all services (manual mode)"
+    echo "  docker      Start with Docker"
+    echo "  stop        Stop all services"
+    echo "  build       Build Docker images"
+    echo "  logs        Show Docker logs"
+    echo "  status      Show service status"
+    echo "  cleanup     Clean up all files and containers"
+    echo "  help        Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./run.sh install    # Install dependencies"
+    echo "  ./run.sh docker     # Start with Docker"
+    echo "  ./run.sh status     # Check status"
+}
+
+# Main script logic
+case "${1:-help}" in
+    "install")
+        check_prerequisites
+        install_backend
+        install_frontend
+        print_status "Installation completed"
         ;;
-    "run")
-        echo "🎯 Đang chạy ứng dụng..."
-        java -cp "lib/*:out" views.Main
+    "start")
+        check_prerequisites
+        start_backend
+        sleep 2
+        start_frontend
+        print_status "All services started"
+        print_status "Frontend: http://localhost:3000"
+        print_status "Backend: http://localhost:8000"
+        print_status "API Docs: http://localhost:8000/docs"
+        print_status "Press Ctrl+C to stop"
+        wait
         ;;
-    "build")
-        echo "🔨 Build hoàn toàn..."
-        rm -rf out
-        javac -cp "lib/*:src" -d out src/views/Main.java
-        javac -cp "lib/*:src" -d out src/utils/*.java
-        echo "✅ Build hoàn thành!"
-        ;;
-    "reset")
-        echo "🔄 Reset hoàn toàn..."
-        pkill -f "java.*views.Main" 2>/dev/null
-        pkill -f "java.*H2WebConsole" 2>/dev/null
-        rm -f *.db
-        rm -rf out
-        javac -cp "lib/*:src" -d out src/views/Main.java
-        javac -cp "lib/*:src" -d out src/utils/*.java
-        echo "✅ Reset hoàn thành!"
+    "docker")
+        check_prerequisites
+        start_docker
         ;;
     "stop")
-        echo "⏹️ Dừng ứng dụng..."
-        pkill -f "java.*views.Main"
-        echo "✅ Đã dừng ứng dụng!"
+        stop_docker
+        pkill -f "uvicorn" 2>/dev/null || true
+        pkill -f "npm start" 2>/dev/null || true
+        print_status "All services stopped"
         ;;
-    "view")
-        echo "👀 Xem dữ liệu database..."
-        # Đảm bảo utility classes được compile
-        javac -cp "lib/*:src" -d out src/utils/H2DatabaseViewer.java 2>/dev/null
-        java -cp "lib/*:out" utils.H2DatabaseViewer
+    "build")
+        build_docker
         ;;
-    "fullview")
-        echo "👀 Xem đầy đủ dữ liệu database..."
-        javac -cp "lib/*:src" -d out src/utils/FullDatabaseViewer.java
-        java -cp "lib/*:out" utils.FullDatabaseViewer
-        ;;
-    "test")
-        echo "🧪 Test thêm nhân viên..."
-        # Đảm bảo utility classes được compile
-        javac -cp "lib/*:src" -d out src/utils/TestAddEmployee.java 2>/dev/null
-        java -cp "lib/*:out" utils.TestAddEmployee
-        ;;
-    "console")
-        echo "🌐 Khởi động H2 Web Console..."
-        echo "📡 URL: http://localhost:8082"
-        echo "🔑 Username: sa, Password: (để trống)"
-        # Đảm bảo utility classes được compile
-        javac -cp "lib/*:src" -d out src/utils/H2WebConsole.java 2>/dev/null
-        java -cp "lib/*:out" utils.H2WebConsole
-        ;;
-    "console-start")
-        echo "🌐 Khởi động H2 Web Console trong background..."
-        echo "📡 URL: http://localhost:8082"
-        echo "🔑 Username: sa, Password: (để trống)"
-        echo "💡 Sử dụng './run.sh console-stop' để dừng"
-        # Đảm bảo utility classes được compile
-        javac -cp "lib/*:src" -d out src/utils/H2WebConsole.java 2>/dev/null
-        nohup java -cp "lib/*:out" utils.H2WebConsole > h2_console.log 2>&1 &
-        echo "✅ H2 Console đã khởi động trong background!"
-        echo "📝 Log file: h2_console.log"
-        ;;
-    "console-stop")
-        echo "⏹️ Dừng H2 Web Console..."
-        pkill -f "java.*H2WebConsole"
-        echo "✅ Đã dừng H2 Console!"
-        ;;
-    "schema")
-        echo "🏗️ Tạo đầy đủ schema database..."
-        javac -cp "lib/*:src" -d out src/utils/DatabaseSchemaCreator.java
-        java -cp "lib/*:out" utils.DatabaseSchemaCreator
-        echo "✅ Schema đã được tạo!"
-        ;;
-    "seed")
-        echo "🌱 Tạo dữ liệu mẫu..."
-        javac -cp "lib/*:src" -d out src/utils/DataSeeder.java
-        java -cp "lib/*:out" utils.DataSeeder
-        echo "✅ Dữ liệu mẫu đã được tạo!"
-        ;;
-    "fix")
-        echo "🔧 Sửa lỗi database..."
-        javac -cp "lib/*:src" -d out src/utils/DatabaseFixer.java
-        java -cp "lib/*:out" utils.DatabaseFixer
-        echo "✅ Đã sửa lỗi database!"
+    "logs")
+        show_logs
         ;;
     "status")
-        echo "📊 Trạng thái ứng dụng:"
-        if pgrep -f "java.*views.Main" > /dev/null; then
-            echo "✅ Ứng dụng đang chạy"
-            ps aux | grep "java.*views.Main" | grep -v grep
-        else
-            echo "❌ Ứng dụng không chạy"
-        fi
-        
-        echo ""
-        echo "🌐 Trạng thái H2 Console:"
-        if pgrep -f "java.*H2WebConsole" > /dev/null; then
-            echo "✅ H2 Console đang chạy trên port 8082"
-            echo "📡 URL: http://localhost:8082"
-        else
-            echo "❌ H2 Console không chạy"
-        fi
-        
-        echo ""
-        echo "📁 Database files:"
-        ls -la *.db 2>/dev/null || echo "Không có file database"
-        
-        echo ""
-        echo "📦 Compiled classes:"
-        if [ -d "out" ]; then
-            echo "✅ Thư mục out tồn tại"
-            echo "   Views: $(ls out/views/*.class 2>/dev/null | wc -l) files"
-            echo "   Utils: $(ls out/utils/*.class 2>/dev/null | wc -l) files"
-        else
-            echo "❌ Thư mục out không tồn tại"
-        fi
+        show_status
         ;;
-    *)
-        echo "📖 Cách sử dụng:"
-        echo "  ./run.sh compile       - Compile project"
-        echo "  ./run.sh run          - Chạy ứng dụng"
-        echo "  ./run.sh build        - Build hoàn toàn"
-        echo "  ./run.sh reset        - Reset hoàn toàn (xóa DB + rebuild)"
-        echo "  ./run.sh stop         - Dừng ứng dụng"
-        echo "  ./run.sh view         - Xem dữ liệu database"
-        echo "  ./run.sh fullview     - Xem đầy đủ dữ liệu database"
-        echo "  ./run.sh test         - Test thêm nhân viên"
-        echo "  ./run.sh console      - Khởi động H2 Web Console (foreground)"
-        echo "  ./run.sh console-start - Khởi động H2 Web Console (background)"
-        echo "  ./run.sh console-stop  - Dừng H2 Web Console"
-        echo "  ./run.sh schema       - Tạo đầy đủ schema database"
-        echo "  ./run.sh seed         - Tạo dữ liệu mẫu"
-        echo "  ./run.sh fix          - Sửa lỗi database"
-        echo "  ./run.sh status       - Xem trạng thái ứng dụng"
-        echo ""
-        echo "💡 Ví dụ: ./run.sh reset && ./run.sh run"
-        echo "💡 Tạo schema: ./run.sh schema"
-        echo "💡 Xem database: ./run.sh view"
-        echo "💡 H2 Console: ./run.sh console-start"
+    "cleanup")
+        cleanup
+        ;;
+    "help"|*)
+        show_help
         ;;
 esac
