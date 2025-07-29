@@ -80,70 +80,70 @@ public class DataSeeder {
             "'NV001', 'Nguyễn Văn An', 'Nam', 'nguyenvanan@philong.com.vn', " +
             "'123 Đường Lê Lợi, Phường 1, Quận 1, TP.HCM', '1990-05-15', 'Việt Nam', '0123456789', " +
             "'Đại học', 'TP.HCM', '123 Đường Lê Lợi, Phường 1, Quận 1, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV001', 'Nguyễn Văn Bố', 'Trần Thị Mẹ')",
+            "'CV001', 'Nguyễn Văn Bố', 'Trần Thị Mẹ', null, null)",
             
             // NV002 - Nhân viên 2  
             "INSERT INTO nhanvien VALUES (" +
             "'NV002', 'Trần Thị Bình', 'Nữ', 'tranthibinh@philong.com.vn', " +
             "'456 Đường Nguyễn Huệ, Phường 2, Quận 3, TP.HCM', '1992-08-20', 'Việt Nam', '0987654321', " +
             "'Cao đẳng', 'TP.HCM', '456 Đường Nguyễn Huệ, Phường 2, Quận 3, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV002', 'Trần Văn Bố', 'Lê Thị Mẹ')",
+            "'CV002', 'Trần Văn Bố', 'Lê Thị Mẹ', null, null)",
             
             // NV003 - Nhân viên 3
             "INSERT INTO nhanvien VALUES (" +
             "'NV003', 'Lê Văn Minh', 'Nam', 'levanminh@philong.com.vn', " +
             "'789 Đường Pasteur, Phường 3, Quận 1, TP.HCM', '1988-12-10', 'Việt Nam', '0369852147', " +
             "'Đại học', 'TP.HCM', '789 Đường Pasteur, Phường 3, Quận 1, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV001', 'Lê Văn Bố', 'Phạm Thị Mẹ')",
+            "'CV001', 'Lê Văn Bố', 'Phạm Thị Mẹ', null, null)",
             
             // NV004 - Nhân viên 4
             "INSERT INTO nhanvien VALUES (" +
             "'NV004', 'Phạm Thị Lan', 'Nữ', 'phamthilan@philong.com.vn', " +
             "'321 Đường Võ Văn Tần, Phường 4, Quận 3, TP.HCM', '1995-03-25', 'Việt Nam', '0521478963', " +
             "'Trung cấp', 'TP.HCM', '321 Đường Võ Văn Tần, Phường 4, Quận 3, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV003', 'Phạm Văn Bố', 'Nguyễn Thị Mẹ')",
+            "'CV003', 'Phạm Văn Bố', 'Nguyễn Thị Mẹ', null, null)",
             
             // NV005 - Nhân viên 5
             "INSERT INTO nhanvien VALUES (" +
             "'NV005', 'Hoàng Văn Dũng', 'Nam', 'hoangvandung@philong.com.vn', " +
             "'654 Đường Hai Bà Trưng, Phường 5, Quận 1, TP.HCM', '1985-07-18', 'Việt Nam', '0789456123', " +
             "'Đại học', 'TP.HCM', '654 Đường Hai Bà Trưng, Phường 5, Quận 1, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV002', 'Hoàng Văn Bố', 'Trịnh Thị Mẹ')",
+            "'CV002', 'Hoàng Văn Bố', 'Trịnh Thị Mẹ', null, null)",
             
             // NV006 - Nhân viên 6
             "INSERT INTO nhanvien VALUES (" +
             "'NV006', 'Vũ Thị Hương', 'Nữ', 'vuthihuong@philong.com.vn', " +
             "'987 Đường Đồng Khởi, Phường 6, Quận 1, TP.HCM', '1993-11-30', 'Việt Nam', '0912345678', " +
             "'Cao đẳng', 'TP.HCM', '987 Đường Đồng Khởi, Phường 6, Quận 1, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV003', 'Vũ Văn Bố', 'Đặng Thị Mẹ')",
+            "'CV003', 'Vũ Văn Bố', 'Đặng Thị Mẹ', null, null)",
             
             // NV007 - Nhân viên 7
             "INSERT INTO nhanvien VALUES (" +
             "'NV007', 'Đặng Văn Phúc', 'Nam', 'dangvanphuc@philong.com.vn', " +
             "'147 Đường Lý Tự Trọng, Phường 7, Quận 1, TP.HCM', '1987-04-12', 'Việt Nam', '0654321987', " +
             "'Đại học', 'TP.HCM', '147 Đường Lý Tự Trọng, Phường 7, Quận 1, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV001', 'Đặng Văn Bố', 'Lý Thị Mẹ')",
+            "'CV001', 'Đặng Văn Bố', 'Lý Thị Mẹ', null, null)",
             
             // NV008 - Nhân viên 8
             "INSERT INTO nhanvien VALUES (" +
             "'NV008', 'Lý Thị Mai', 'Nữ', 'lythimai@philong.com.vn', " +
             "'258 Đường Trần Hưng Đạo, Phường 8, Quận 5, TP.HCM', '1991-09-05', 'Việt Nam', '0898765432', " +
             "'Trung cấp', 'TP.HCM', '258 Đường Trần Hưng Đạo, Phường 8, Quận 5, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV003', 'Lý Văn Bố', 'Hoàng Thị Mẹ')",
+            "'CV003', 'Lý Văn Bố', 'Hoàng Thị Mẹ', null, null)",
             
             // NV009 - Nhân viên 9
             "INSERT INTO nhanvien VALUES (" +
             "'NV009', 'Bùi Văn Thành', 'Nam', 'buivanthanh@philong.com.vn', " +
             "'369 Đường Nguyễn Thị Minh Khai, Phường 9, Quận 3, TP.HCM', '1989-06-22', 'Việt Nam', '0432167890', " +
             "'Đại học', 'TP.HCM', '369 Đường Nguyễn Thị Minh Khai, Phường 9, Quận 3, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV002', 'Bùi Văn Bố', 'Vũ Thị Mẹ')",
+            "'CV002', 'Bùi Văn Bố', 'Vũ Thị Mẹ', null, null)",
             
             // NV010 - Nhân viên 10
             "INSERT INTO nhanvien VALUES (" +
             "'NV010', 'Ngô Thị Xuân', 'Nữ', 'ngothixuan@philong.com.vn', " +
             "'741 Đường Cách Mạng Tháng 8, Phường 10, Quận 3, TP.HCM', '1994-01-15', 'Việt Nam', '0765432109', " +
             "'Cao đẳng', 'TP.HCM', '741 Đường Cách Mạng Tháng 8, Phường 10, Quận 3, TP.HCM', 'Kinh', 'Tốt', " +
-            "'CV003', 'Ngô Văn Bố', 'Bùi Thị Mẹ')"
+            "'CV003', 'Ngô Văn Bố', 'Bùi Thị Mẹ', null, null)"
         };
         
         for (String insert : inserts) {

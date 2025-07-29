@@ -3,6 +3,7 @@ package dao;
 import bean.NhanVienBean;
 import utils.MockDatabase;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MockNhanVienDao {
     
@@ -26,6 +27,25 @@ public class MockNhanVienDao {
     }
     
     public String getMaNhanVienLast() throws Exception {
-        return MockDatabase.getLastMaNhanVien();
+        List<String> existingIds = new ArrayList<>();
+        for (NhanVienBean nv : MockDatabase.getAllNhanVien()) {
+            if (nv.getManv() != null && nv.getManv().startsWith("NV")) {
+                existingIds.add(nv.getManv());
+            }
+        }
+        
+        if (existingIds.isEmpty()) {
+            return "NV001";
+        }
+        
+        // Tìm mã tiếp theo chưa được sử dụng
+        int nextId = 1;
+        while (true) {
+            String candidateId = String.format("NV%03d", nextId);
+            if (!existingIds.contains(candidateId)) {
+                return candidateId;
+            }
+            nextId++;
+        }
     }
 }

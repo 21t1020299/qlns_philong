@@ -2,6 +2,7 @@ package dao;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import bean.NhanVienBean;
 import utils.ConnectorDB;
 
@@ -34,7 +35,7 @@ public class NhanVienDao {
             throw new Exception("Không thể kết nối đến database. Vui lòng kiểm tra kết nối internet và cấu hình database.");
         }
         
-        String sql = "INSERT INTO nhanvien VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; // 16 parameters
+        String sql = "INSERT INTO nhanvien VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; // 18 parameters (bao gồm 2 trường ảnh)
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, nv.getManv());
         ps.setString(2, nv.getTennv());
@@ -52,6 +53,8 @@ public class NhanVienDao {
         ps.setString(14, nv.getMacv());
         ps.setString(15, nv.getHotencha());
         ps.setString(16, nv.getHotenme());
+        ps.setString(17, null); // anhchandung
+        ps.setString(18, null); // anhcmnd
         return ps.executeUpdate();
     }
 
@@ -90,7 +93,9 @@ public class NhanVienDao {
             throw new Exception("Không thể kết nối đến database. Vui lòng kiểm tra kết nối internet và cấu hình database.");
         }
         
-        String sql = "DELETE FROM nhanvien WHERE manv=?";
+        // Sử dụng LIMIT 1 để chỉ xóa một bản ghi đầu tiên tìm thấy
+        // Điều này ngăn chặn việc xóa tất cả các bản ghi có cùng mã nhân viên
+        String sql = "DELETE FROM nhanvien WHERE manv=? LIMIT 1";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, maNV);
         return ps.executeUpdate();
@@ -103,22 +108,30 @@ public class NhanVienDao {
             throw new Exception("Không thể kết nối đến database. Vui lòng kiểm tra kết nối internet và cấu hình database.");
         }
         
-        PreparedStatement ps = conn.prepareStatement("SELECT manv FROM nhanvien ORDER BY manv DESC LIMIT 1");
+        // Lấy tất cả mã nhân viên hiện có
+        PreparedStatement ps = conn.prepareStatement("SELECT manv FROM nhanvien ORDER BY manv");
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            String lastMa = rs.getString("manv");
-            // Tạo mã mới dựa trên mã cuối cùng
-            if (lastMa != null && lastMa.startsWith("NV")) {
-                try {
-                    int num = Integer.parseInt(lastMa.substring(2)) + 1;
-                    return String.format("NV%03d", num);
-                } catch (NumberFormatException e) {
-                    // Nếu không parse được số, trả về NV001
-                    return "NV001";
-                }
+        
+        List<String> existingIds = new ArrayList<>();
+        while (rs.next()) {
+            String manv = rs.getString("manv");
+            if (manv != null && manv.startsWith("NV")) {
+                existingIds.add(manv);
             }
         }
-        // Nếu không có nhân viên nào, trả về NV001
-        return "NV001";
+        
+        if (existingIds.isEmpty()) {
+            return "NV001";
+        }
+        
+        // Tìm mã tiếp theo chưa được sử dụng
+        int nextId = 1;
+        while (true) {
+            String candidateId = String.format("NV%03d", nextId);
+            if (!existingIds.contains(candidateId)) {
+                return candidateId;
+            }
+            nextId++;
+        }
     }
 }

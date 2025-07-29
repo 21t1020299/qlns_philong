@@ -9,8 +9,8 @@ import bo.NhanVienBo;
 public class NhanVien extends JPanel {
     // Các trường thông tin cơ bản
     private JTextField txtMaNV, txtHoTen, txtEmail, txtNgaySinh;
-    private JTextField txtDanToc, txtTrinhDo, txtNoiDKKT, txtDiaChi, txtSDT;
-    private JTextField txtDiaChiThuongTru, txtQuocTich, txtTinhTrangSK;
+    private JTextField txtDiaChi, txtSDT;
+    private JTextField txtDiaChiThuongTru;
     private JTextField txtHoTenCha, txtHoTenMe;
     
     // ComboBox cho chức vụ, giới tính và các trường có dữ liệu sẵn
@@ -201,10 +201,10 @@ public class NhanVien extends JPanel {
             }
             
             String maNV = txtMaNV.getText();
-            String hoTen = txtHoTen.getText();
-            String email = txtEmail.getText();
+                    String hoTen = txtHoTen.getText();
+                    String email = txtEmail.getText();
             String gioiTinh = cboGioiTinh.getSelectedItem().toString();
-            String ngaySinh = txtNgaySinh.getText();
+                    String ngaySinh = txtNgaySinh.getText();
             String danToc = cboDanToc.getSelectedItem().toString();
             String trinhDo = cboTrinhDo.getSelectedItem().toString();
             String noiDKKT = cboNoiDKKT.getSelectedItem().toString();
@@ -218,8 +218,8 @@ public class NhanVien extends JPanel {
             
             // Lấy mã chức vụ từ combobox
             String chucVu = cboChucVu.getSelectedItem().toString().split(" - ")[0];
-            
-            if (currentNhanVien == null) {
+
+                    if (currentNhanVien == null) {
                 // Thêm mới
                 if (maNV.isEmpty()) {
                     maNV = nvBo.newMaNhanVien();
@@ -232,18 +232,18 @@ public class NhanVien extends JPanel {
                     hoTenCha, hoTenMe
                 );
                 
-                nvBo.themNhanVien(nv);
+                        nvBo.themNhanVien(nv);
                 JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 
                 // Reset form sau khi thêm thành công
                 resetForm();
                 
-            } else {
+                    } else {
                 // Cập nhật
-                currentNhanVien.setTennv(hoTen);
-                currentNhanVien.setEmail(email);
+                        currentNhanVien.setTennv(hoTen);
+                        currentNhanVien.setEmail(email);
                 currentNhanVien.setGtinh(gioiTinh);
-                currentNhanVien.setNgsinh(ngaySinh);
+                        currentNhanVien.setNgsinh(ngaySinh);
                 currentNhanVien.setDtoc(danToc);
                 currentNhanVien.setTrinhdo(trinhDo);
                 currentNhanVien.setNoidkhktt(noiDKKT);
@@ -256,7 +256,7 @@ public class NhanVien extends JPanel {
                 currentNhanVien.setHotenme(hoTenMe);
                 currentNhanVien.setMacv(chucVu);
                 
-                nvBo.capNhatNhanVien(currentNhanVien);
+                        nvBo.capNhatNhanVien(currentNhanVien);
                 JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 
                 // Reset form sau khi cập nhật thành công
@@ -268,8 +268,8 @@ public class NhanVien extends JPanel {
                 routerListener.routeTo("dsnv");
             }
             
-        } catch (Exception ex) {
-            ex.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -504,16 +504,11 @@ public class NhanVien extends JPanel {
         
         // Tự động tạo mã nhân viên mới nếu là thêm mới
         if (nv == null) {
-            try {
-                txtMaNV.setText(nvBo.newMaNhanVien());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             resetForm();
             return;
         }
         
-        // Điền thông tin vào form
+        // Điền thông tin vào form cho chế độ sửa
         txtMaNV.setText(nv.getManv());
         txtHoTen.setText(nv.getTennv());
         txtEmail.setText(nv.getEmail());
@@ -596,6 +591,15 @@ public class NhanVien extends JPanel {
     }
     
     private void resetForm() {
+        // Tự động tạo mã nhân viên mới
+        try {
+            txtMaNV.setText(nvBo.newMaNhanVien());
+        } catch (Exception e) {
+            e.printStackTrace();
+            txtMaNV.setText("NV001"); // Fallback
+        }
+        
+        // Reset các trường khác
         txtHoTen.setText("");
         txtEmail.setText("");
         cboGioiTinh.setSelectedIndex(0);
@@ -611,5 +615,8 @@ public class NhanVien extends JPanel {
         cboChucVu.setSelectedIndex(0);
         txtHoTenCha.setText("");
         txtHoTenMe.setText("");
+        
+        // Reset currentNhanVien để chuyển về chế độ thêm mới
+        currentNhanVien = null;
     }
 }

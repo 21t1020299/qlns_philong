@@ -47,13 +47,15 @@ public class H2Connector {
                 skhoe VARCHAR(50),
                 macv VARCHAR(10),
                 hotencha VARCHAR(100),
-                hotenme VARCHAR(100)
+                hotenme VARCHAR(100),
+                anhchandung VARCHAR(255),
+                anhcmnd VARCHAR(255)
             )
         """;
         
         Statement stmt = connection.createStatement();
         stmt.execute(sql);
-        System.out.println("✅ Bảng nhanvien đã sẵn sàng (16 trường)");
+        System.out.println("✅ Bảng nhanvien đã sẵn sàng (18 trường)");
     }
     
     private static void insertSampleDataIfEmpty() throws Exception {
@@ -67,9 +69,9 @@ public class H2Connector {
             System.out.println("📝 Thêm dữ liệu mẫu...");
             
             String[] inserts = {
-                "INSERT INTO nhanvien VALUES ('NV001', 'Nguyễn Văn An', 'Nam', 'nguyenvanan@gmail.com', '123 Đường ABC, Hà Nội', '1990-05-15', 'Việt Nam', '0123456789', 'Đại học', 'Hà Nội', '123 Đường ABC, Hà Nội', 'Kinh', 'Tốt', 'CV001', 'Nguyễn Văn Bố', 'Trần Thị Mẹ')",
-                "INSERT INTO nhanvien VALUES ('NV002', 'Trần Thị Bình', 'Nữ', 'tranthibinh@gmail.com', '456 Đường XYZ, TP.HCM', '1992-08-20', 'Việt Nam', '0987654321', 'Cao đẳng', 'TP.HCM', '456 Đường XYZ, TP.HCM', 'Kinh', 'Tốt', 'CV002', 'Trần Văn Bố', 'Lê Thị Mẹ')",
-                "INSERT INTO nhanvien VALUES ('NV003', 'Lê Văn Minh', 'Nam', 'levanminh@gmail.com', '789 Đường DEF, Đà Nẵng', '1988-12-10', 'Việt Nam', '0369852147', 'Đại học', 'Đà Nẵng', '789 Đường DEF, Đà Nẵng', 'Kinh', 'Tốt', 'CV001', 'Lê Văn Bố', 'Phạm Thị Mẹ')"
+                "INSERT INTO nhanvien VALUES ('NV001', 'Nguyễn Văn An', 'Nam', 'nguyenvanan@gmail.com', '123 Đường ABC, Hà Nội', '1990-05-15', 'Việt Nam', '0123456789', 'Đại học', 'Hà Nội', '123 Đường ABC, Hà Nội', 'Kinh', 'Tốt', 'CV001', 'Nguyễn Văn Bố', 'Trần Thị Mẹ', null, null)",
+                "INSERT INTO nhanvien VALUES ('NV002', 'Trần Thị Bình', 'Nữ', 'tranthibinh@gmail.com', '456 Đường XYZ, TP.HCM', '1992-08-20', 'Việt Nam', '0987654321', 'Cao đẳng', 'TP.HCM', '456 Đường XYZ, TP.HCM', 'Kinh', 'Tốt', 'CV002', 'Trần Văn Bố', 'Lê Thị Mẹ', null, null)",
+                "INSERT INTO nhanvien VALUES ('NV003', 'Lê Văn Minh', 'Nam', 'levanminh@gmail.com', '789 Đường DEF, Đà Nẵng', '1988-12-10', 'Việt Nam', '0369852147', 'Đại học', 'Đà Nẵng', '789 Đường DEF, Đà Nẵng', 'Kinh', 'Tốt', 'CV001', 'Lê Văn Bố', 'Phạm Thị Mẹ', null, null)"
             };
             
             for (String insert : inserts) {
