@@ -26,8 +26,8 @@ docker-compose up -d
 
 # Truy cập ứng dụng
 # Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+# Backend API: https://qlns-philong.onrender.com
+# API Docs: https://qlns-philong.onrender.com/docs
 ```
 
 ### Chạy thủ công
@@ -242,7 +242,7 @@ DEBUG=True
 ### Frontend (.env)
 
 ```env
-REACT_APP_API_URL=http://localhost:8000
+REACT_APP_API_URL=https://qlns-philong.onrender.com
 ```
 
 ## 📝 License

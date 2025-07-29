@@ -98,7 +98,7 @@ start_backend() {
     source venv/bin/activate
     uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
     cd ..
-    print_status "Backend server started on http://localhost:8000"
+    print_status "Backend server started on https://qlns-philong.onrender.com"
 }
 
 # Start frontend server
@@ -116,8 +116,8 @@ start_docker() {
     docker-compose up -d
     print_status "Services started with Docker"
     print_status "Frontend: http://localhost:3000"
-    print_status "Backend: http://localhost:8000"
-    print_status "API Docs: http://localhost:8000/docs"
+    print_status "Backend: https://qlns-philong.onrender.com"
+    print_status "API Docs: https://qlns-philong.onrender.com/docs"
 }
 
 # Stop Docker services
@@ -235,8 +235,8 @@ case "${1:-help}" in
         start_frontend
         print_status "All services started"
         print_status "Frontend: http://localhost:3000"
-        print_status "Backend: http://localhost:8000"
-        print_status "API Docs: http://localhost:8000/docs"
+        print_status "Backend: https://qlns-philong.onrender.com"
+        print_status "API Docs: https://qlns-philong.onrender.com/docs"
         print_status "Press Ctrl+C to stop"
         wait
         ;;
