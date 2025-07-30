@@ -147,7 +147,6 @@ def create_employee(employee_data: EmployeeCreate, db: Session = Depends(get_db)
     
     # Create employee object
     employee = Employee(
-        id=str(uuid.uuid4()),
         manv=manv,
         **employee_data.dict()
     )
