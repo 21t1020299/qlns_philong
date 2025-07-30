@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Employee, EmployeeFormData } from '../types/employee';
+import { optionsAPI } from '../services/api';
 import './EmployeeForm.css';
 
 interface EmployeeFormProps {
@@ -34,6 +35,35 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<EmployeeFormData>>({});
+  const [options, setOptions] = useState<{
+    dantoc: Array<{value: string; label: string}>;
+    suckhoe: Array<{value: string; label: string}>;
+    quoctich: Array<{value: string; label: string}>;
+    chucvu: Array<{value: string; label: string}>;
+  }>({
+    dantoc: [],
+    suckhoe: [],
+    quoctich: [],
+    chucvu: []
+  });
+
+  useEffect(() => {
+    // Load options
+    const loadOptions = async () => {
+      try {
+        const [dantoc, suckhoe, quoctich, chucvu] = await Promise.all([
+          optionsAPI.getDantocOptions(),
+          optionsAPI.getSuckhoeOptions(),
+          optionsAPI.getQuoctichOptions(),
+          optionsAPI.getChucvuOptions()
+        ]);
+        setOptions({ dantoc, suckhoe, quoctich, chucvu });
+      } catch (error) {
+        console.error('Error loading options:', error);
+      }
+    };
+    loadOptions();
+  }, []);
 
   useEffect(() => {
     if (employee) {
@@ -247,15 +277,21 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
             <div className="form-group">
               <label htmlFor="macv">Mã chức vụ <span className="required">*</span></label>
-              <input
-                type="text"
+              <select
                 id="macv"
                 name="macv"
                 value={formData.macv}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.macv ? 'error' : ''}
-              />
+              >
+                <option value="">Chọn chức vụ</option>
+                {options.chucvu.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               {errors.macv && <span className="error-message">{errors.macv}</span>}
             </div>
 
@@ -303,15 +339,21 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
             <div className="form-group">
               <label htmlFor="dtoc">Dân tộc <span className="required">*</span></label>
-              <input
-                type="text"
+              <select
                 id="dtoc"
                 name="dtoc"
                 value={formData.dtoc}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.dtoc ? 'error' : ''}
-              />
+              >
+                <option value="">Chọn dân tộc</option>
+                {options.dantoc.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               {errors.dtoc && <span className="error-message">{errors.dtoc}</span>}
             </div>
 
@@ -336,29 +378,41 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
             <div className="form-group">
               <label htmlFor="qtich">Quốc tịch <span className="required">*</span></label>
-              <input
-                type="text"
+              <select
                 id="qtich"
                 name="qtich"
                 value={formData.qtich}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.qtich ? 'error' : ''}
-              />
+              >
+                <option value="">Chọn quốc tịch</option>
+                {options.quoctich.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               {errors.qtich && <span className="error-message">{errors.qtich}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="skhoe">Sức khỏe <span className="required">*</span></label>
-              <input
-                type="text"
+              <select
                 id="skhoe"
                 name="skhoe"
                 value={formData.skhoe}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.skhoe ? 'error' : ''}
-              />
+              >
+                <option value="">Chọn tình trạng sức khỏe</option>
+                {options.suckhoe.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               {errors.skhoe && <span className="error-message">{errors.skhoe}</span>}
             </div>
 

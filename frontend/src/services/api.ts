@@ -102,4 +102,33 @@ export const healthAPI = {
   },
 };
 
+export const optionsAPI = {
+  // Get dân tộc options
+  getDantocOptions: async (): Promise<Array<{value: string; label: string}>> => {
+    const response = await api.get('/options/dantoc');
+    return response.data;
+  },
+
+  // Get sức khỏe options
+  getSuckhoeOptions: async (): Promise<Array<{value: string; label: string}>> => {
+    const response = await api.get('/options/suckhoe');
+    return response.data;
+  },
+
+  // Get quốc tịch options
+  getQuoctichOptions: async (): Promise<Array<{value: string; label: string}>> => {
+    const response = await api.get('/options/quoctich');
+    return response.data;
+  },
+
+  // Get chức vụ options
+  getChucvuOptions: async (): Promise<Array<{value: string; label: string}>> => {
+    const response = await api.get('/chucvu/');
+    return response.data.map((cv: any) => ({
+      value: cv.macv,
+      label: `${cv.macv} - ${cv.tencv}`
+    }));
+  },
+};
+
 export default api; 
