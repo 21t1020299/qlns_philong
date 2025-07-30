@@ -6,7 +6,13 @@ services:
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///./philong.db
+        value: postgresql://postgres:[YOUR-PASSWORD]@db.wsisepsdhioaikdzrnmd.supabase.co:5432/postgres
+      - key: SUPABASE_URL
+        value: https://wsisepsdhioaikdzrnmd.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzaXNlcHNkaGlvYWlrZHpybm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NjM3MDIsImV4cCI6MjA2OTIzOTcwMn0.kwveMFa2IIwT519B0D1eQr9ZASQm-TmQk90u68kUqQo
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzaXNlcHNkaGlvYWlrZHpybm1kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MzY2MzcwMiwiZXhwIjoyMDY5MjM5NzAyfQ.wcUgiWTOgoEWWSr_R-wtuKr5ZSNRfKmtgpvn7sDJ7cU
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG

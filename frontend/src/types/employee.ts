@@ -4,34 +4,37 @@ export interface Employee {
   tennv: string;
   gtinh: string;
   email: string;
-  sdt: string;
-  ngsinh: string;
   dchi: string;
-  dchithuongtru: string;
-  noidkhktt: string;
-  dtoc: string;
-  trinhdo: string;
+  ngsinh: string;
   qtich: string;
+  sdt: string;
+  trinhdo: string;
+  noidkhktt: string;
+  dchithuongtru: string;
+  dtoc: string;
   skhoe: string;
   macv: string;
   hotencha: string;
   hotenme: string;
-  created_at: string;
-  updated_at: string;
+  anhchandung?: string;
+  anhcmnd?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface EmployeeFormData {
+  manv: string;
   tennv: string;
   gtinh: string;
   email: string;
-  sdt: string;
-  ngsinh: string;
   dchi: string;
-  dchithuongtru: string;
-  noidkhktt: string;
-  dtoc: string;
-  trinhdo: string;
+  ngsinh: string;
   qtich: string;
+  sdt: string;
+  trinhdo: string;
+  noidkhktt: string;
+  dchithuongtru: string;
+  dtoc: string;
   skhoe: string;
   macv: string;
   hotencha: string;
@@ -47,8 +50,10 @@ export interface EmployeeListResponse {
 
 export interface EmployeeStats {
   total: number;
-  male: number;
-  female: number;
-  male_percentage: number;
-  female_percentage: number;
-}
+  male_count: number;
+  female_count: number;
+  education_distribution: Record<string, number>;
+  age_distribution: Record<string, number>;
+  recent_additions: number;
+  last_updated: string;
+} 
