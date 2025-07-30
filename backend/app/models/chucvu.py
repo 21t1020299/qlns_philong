@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text
+from sqlalchemy import Column, String
 from app.database.connection import Base
 
 class ChucVu(Base):
@@ -8,5 +8,4 @@ class ChucVu(Base):
     macv = Column(String(10), primary_key=True, index=True)
     
     # Basic information
-    tencv = Column(String(100), nullable=False)  # Tên chức vụ
-    mota = Column(Text, nullable=True)  # Mô tả 
+    tencv = Column(String(100), nullable=False)  # Tên chức vụ 

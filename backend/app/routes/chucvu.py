@@ -31,10 +31,10 @@ def create_chucvu(chucvu_data: ChucVuCreate, db: Session = Depends(get_db)):
 def init_chucvu(db: Session = Depends(get_db)):
     """Initialize default chức vụ"""
     default_chucvu = [
-        {"macv": "CV001", "tencv": "Nhân viên", "mota": "Nhân viên cơ bản"},
-        {"macv": "CV002", "tencv": "Trưởng nhóm", "mota": "Trưởng nhóm dự án"},
-        {"macv": "CV003", "tencv": "Quản lý", "mota": "Quản lý phòng ban"},
-        {"macv": "CV004", "tencv": "Giám đốc", "mota": "Giám đốc công ty"},
+        {"macv": "CV001", "tencv": "Nhân viên"},
+        {"macv": "CV002", "tencv": "Trưởng nhóm"},
+        {"macv": "CV003", "tencv": "Quản lý"},
+        {"macv": "CV004", "tencv": "Giám đốc"},
     ]
     
     for cv_data in default_chucvu:
