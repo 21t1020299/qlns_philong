@@ -58,8 +58,9 @@ export const employeeAPI = {
     search?: string;
   } = {}): Promise<EmployeeListResponse> => {
     const { page = 1, size = 10, search = '' } = params;
+    const skip = (page - 1) * size;
     const response = await api.get('/employees/', {
-      params: { page, size, search }
+      params: { skip, limit: size, search }
     });
     return response.data;
   },

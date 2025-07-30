@@ -61,6 +61,14 @@ const EmployeeList: React.FC = () => {
     loadStats();
   }, [currentPage, searchTerm]);
 
+  // Add refresh function
+  const handleRefresh = async () => {
+    await loadEmployees();
+    await loadStats();
+    setSuccess('Dữ liệu đã được cập nhật!');
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
   // Handle search
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -100,11 +108,14 @@ const EmployeeList: React.FC = () => {
         // Add new employee
         await employeeAPI.createEmployee(formData);
         setSuccess('Thêm nhân viên thành công!');
+        // Reset to first page when adding new employee
+        setCurrentPage(1);
       }
       
       setShowForm(false);
-      loadEmployees();
-      loadStats();
+      // Reload data after form submission
+      await loadEmployees();
+      await loadStats();
     } catch (err) {
       setError('Lỗi: ' + (err as Error).message);
     } finally {
@@ -121,8 +132,13 @@ const EmployeeList: React.FC = () => {
     try {
       await employeeAPI.deleteEmployee(manv);
       setSuccess('Xóa nhân viên thành công!');
-      loadEmployees();
-      loadStats();
+      // Check if current page will be empty after deletion
+      if (employees.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+      // Reload data after deletion
+      await loadEmployees();
+      await loadStats();
     } catch (err) {
       setError('Lỗi xóa nhân viên: ' + (err as Error).message);
     }
@@ -205,7 +221,7 @@ const EmployeeList: React.FC = () => {
               onChange={handleSearch}
             />
           </div>
-          <button className="btn btn-primary" onClick={loadEmployees}>
+          <button className="btn btn-primary" onClick={handleRefresh}>
             🔄 Làm mới
           </button>
           <button className="btn btn-success" onClick={handleAddEmployee}>
