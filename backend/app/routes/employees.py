@@ -82,7 +82,7 @@ def get_employee_stats(db: Session = Depends(get_db)):
         # Get education level distribution
         education_stats = db.query(
             Employee.trinhdo,
-            func.count(Employee.id).label('count')
+            func.count(Employee.manv).label('count')
         ).group_by(Employee.trinhdo).all()
         
         # Get age distribution
