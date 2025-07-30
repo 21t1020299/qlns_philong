@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Employee, EmployeeFormData, EmployeeListResponse, EmployeeStats } from '../types/employee';
+import { Employee, EmployeeFormData, EmployeeStats } from '../types/employee';
 import { employeeAPI } from '../services/api';
 import EmployeeForm from './EmployeeForm';
 import './EmployeeList.css';

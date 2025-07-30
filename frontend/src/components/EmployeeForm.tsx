@@ -61,7 +61,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
     switch (name) {
       case 'tennv':
         if (!value.trim()) return 'Họ tên không được để trống';
-        if (!/^[a-zA-ZÀ-ỹ\s\-]+$/.test(value)) {
+        if (!/^[a-zA-ZÀ-ỹ\s-]+$/.test(value)) {
           return 'Họ tên chỉ được chứa chữ cái, dấu tiếng Việt và khoảng trắng';
         }
         break;
@@ -104,7 +104,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       case 'hotencha':
       case 'hotenme':
         if (!value.trim()) return 'Họ tên không được để trống';
-        if (!/^[a-zA-ZÀ-ỹ\s\-]+$/.test(value)) {
+        if (!/^[a-zA-ZÀ-ỹ\s-]+$/.test(value)) {
           return 'Họ tên chỉ được chứa chữ cái';
         }
         if (value.length > 100) return 'Họ tên không được quá 100 ký tự';
