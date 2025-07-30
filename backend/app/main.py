@@ -38,6 +38,15 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+@app.post("/init-db")
+def init_database():
+    """Initialize database tables"""
+    try:
+        employee.Base.metadata.create_all(bind=engine)
+        return {"message": "Database tables created successfully"}
+    except Exception as e:
+        return {"error": f"Failed to create tables: {str(e)}"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
