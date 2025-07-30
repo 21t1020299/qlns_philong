@@ -1,5 +1,4 @@
 export interface Employee {
-  id: string;
   manv: string;
   tennv: string;
   gtinh: string;
@@ -18,12 +17,9 @@ export interface Employee {
   hotenme: string;
   anhchandung?: string;
   anhcmnd?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface EmployeeFormData {
-  manv: string;
   tennv: string;
   gtinh: string;
   email: string;
