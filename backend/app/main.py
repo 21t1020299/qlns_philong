@@ -4,8 +4,8 @@ from app.database.connection import engine
 from app.models import employee
 from app.routes import employees
 
-# Create database tables
-employee.Base.metadata.create_all(bind=engine)
+# Create database tables (commented out to avoid startup errors)
+# employee.Base.metadata.create_all(bind=engine)
 
 # Create FastAPI app
 app = FastAPI(
