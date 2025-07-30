@@ -95,10 +95,9 @@ class EmployeeUpdate(BaseModel):
 
 # Employee Response Schema
 class EmployeeResponse(EmployeeBase):
-    id: str
     manv: str
-    created_at: datetime
-    updated_at: datetime
+    anhchandung: Optional[str] = None
+    anhcmnd: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -110,11 +110,8 @@ def get_employee_stats(db: Session = Depends(get_db)):
             elif age and 46 <= age <= 54:
                 age_ranges["46-54"] += 1
         
-        # Get recent employees (last 30 days)
-        thirty_days_ago = datetime.now() - timedelta(days=30)
-        recent_count = db.query(Employee).filter(
-            Employee.created_at >= thirty_days_ago
-        ).count()
+        # Get recent employees (last 30 days) - skip for now since no created_at field
+        recent_count = 0
         
         return EmployeeStats(
             total=total,
@@ -132,7 +129,7 @@ def get_employee_stats(db: Session = Depends(get_db)):
 @router.get("/{employee_id}", response_model=EmployeeResponse)
 def get_employee(employee_id: str, db: Session = Depends(get_db)):
     """Get employee by ID"""
-    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    employee = db.query(Employee).filter(Employee.manv == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
@@ -168,7 +165,7 @@ def update_employee(
     db: Session = Depends(get_db)
 ):
     """Update employee"""
-    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    employee = db.query(Employee).filter(Employee.manv == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
@@ -191,7 +188,7 @@ def update_employee(
 @router.delete("/{employee_id}", status_code=204)
 def delete_employee(employee_id: str, db: Session = Depends(get_db)):
     """Delete employee"""
-    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    employee = db.query(Employee).filter(Employee.manv == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     

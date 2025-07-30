@@ -3,13 +3,10 @@ from sqlalchemy.sql import func
 from app.database.connection import Base
 
 class Employee(Base):
-    __tablename__ = "employees"
+    __tablename__ = "nhanvien"
     
-    # Primary key
-    id = Column(String(36), primary_key=True, index=True)
-    
-    # Employee ID (auto-generated)
-    manv = Column(String(10), unique=True, index=True, nullable=False)
+    # Primary key - use manv as primary key
+    manv = Column(String(10), primary_key=True, index=True)
     
     # Basic information
     tennv = Column(String(100), nullable=False)
@@ -36,6 +33,6 @@ class Employee(Base):
     hotencha = Column(String(100), nullable=False)  # Họ tên cha
     hotenme = Column(String(100), nullable=False)  # Họ tên mẹ
     
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    # Images
+    anhchandung = Column(String(255), nullable=True)  # Ảnh chân dung
+    anhcmnd = Column(String(255), nullable=True)  # Ảnh CMND
