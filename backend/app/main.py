@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import engine
 from app.models import employee, chucvu
-from app.routes import employees, chucvu as chucvu_routes
+from app.routes import employees, chucvu as chucvu_routes, options
 
 # Create database tables (commented out to avoid startup errors)
 # employee.Base.metadata.create_all(bind=engine)
@@ -37,6 +37,7 @@ app.add_middleware(
 # Include routers
 app.include_router(employees.router)
 app.include_router(chucvu_routes.router)
+app.include_router(options.router)
 
 @app.get("/")
 def read_root():
