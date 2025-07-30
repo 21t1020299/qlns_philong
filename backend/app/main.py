@@ -24,6 +24,8 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "https://qlns-philong.vercel.app",
         "https://*.vercel.app",
+        "https://vercel.app",
+        "https://*.vercel.app/*",
         "file://",
         "null"
     ],
