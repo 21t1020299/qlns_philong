@@ -20,15 +20,22 @@ router = APIRouter(
 )
 
 def generate_employee_id(db: Session) -> str:
-    """Generate unique employee ID"""
-    while True:
-        # Generate a random 6-digit number
-        employee_id = f"NV{str(uuid.uuid4().int % 1000000).zfill(6)}"
-        
-        # Check if it already exists
-        existing = db.query(Employee).filter(Employee.manv == employee_id).first()
-        if not existing:
-            return employee_id
+    """Generate unique employee ID - auto increment"""
+    # Get the last employee ID
+    last_employee = db.query(Employee).order_by(Employee.manv.desc()).first()
+    
+    if not last_employee:
+        # If no employees exist, start with NV001
+        return "NV001"
+    
+    # Extract number from last employee ID (e.g., "NV001" -> 1)
+    try:
+        last_number = int(last_employee.manv[2:])  # Remove "NV" prefix
+        next_number = last_number + 1
+        return f"NV{str(next_number).zfill(3)}"  # Pad with zeros
+    except ValueError:
+        # Fallback to random if parsing fails
+        return f"NV{str(uuid.uuid4().int % 1000000).zfill(6)}"
 
 @router.get("/", response_model=EmployeeListResponse)
 def get_employees(

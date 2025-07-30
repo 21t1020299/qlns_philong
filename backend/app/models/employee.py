@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Date, Text, DateTime
+from sqlalchemy import Column, String, Date, Text, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.connection import Base
 
@@ -27,7 +28,8 @@ class Employee(Base):
     skhoe = Column(String(50), nullable=False)  # Sức khỏe
     
     # Work information
-    macv = Column(String(10), nullable=False)  # Mã chức vụ
+    macv = Column(String(10), ForeignKey("chucvu.macv"), nullable=False)  # Mã chức vụ
+    chucvu = relationship("ChucVu", backref="nhanvien")
     
     # Family information
     hotencha = Column(String(100), nullable=False)  # Họ tên cha
