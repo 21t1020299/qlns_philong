@@ -109,3 +109,13 @@ class EmployeeListResponse(BaseModel):
     total: int
     page: int
     size: int
+
+# Employee Statistics Schema
+class EmployeeStats(BaseModel):
+    total: int
+    male_count: int
+    female_count: int
+    education_distribution: dict[str, int]
+    age_distribution: dict[str, int]
+    recent_additions: int
+    last_updated: datetime

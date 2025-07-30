@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
 import re
+from datetime import date, datetime, timedelta
+from sqlalchemy import func
 
 from app.database.connection import get_db
 from app.models.employee import Employee
@@ -10,7 +12,8 @@ from app.schemas.employee import (
     EmployeeCreate, 
     EmployeeUpdate, 
     EmployeeResponse, 
-    EmployeeListResponse
+    EmployeeListResponse,
+    EmployeeStats
 )
 
 router = APIRouter(prefix="/api/employees", tags=["employees"])
@@ -141,17 +144,63 @@ def delete_employee(employee_id: str, db: Session = Depends(get_db)):
     
     return None
 
-@router.get("/stats/summary")
+@router.get("/stats", response_model=EmployeeStats)
 def get_employee_stats(db: Session = Depends(get_db)):
     """Get employee statistics"""
-    total_employees = db.query(Employee).count()
-    male_count = db.query(Employee).filter(Employee.gtinh == "Nam").count()
-    female_count = db.query(Employee).filter(Employee.gtinh == "Nữ").count()
-    
-    return {
-        "total": total_employees,
-        "male": male_count,
-        "female": female_count,
-        "male_percentage": round((male_count / total_employees * 100) if total_employees > 0 else 0, 1),
-        "female_percentage": round((female_count / total_employees * 100) if total_employees > 0 else 0, 1)
-    }
+    try:
+        # Get total count
+        total = db.query(Employee).count()
+        
+        # Get gender distribution
+        male_count = db.query(Employee).filter(Employee.gtinh == "Nam").count()
+        female_count = db.query(Employee).filter(Employee.gtinh == "Nữ").count()
+        
+        # Get education level distribution
+        education_stats = db.query(
+            Employee.trinhdo,
+            func.count(Employee.id).label('count')
+        ).group_by(Employee.trinhdo).all()
+        
+        # Get age distribution
+        today = date.today()
+        age_stats = db.query(
+            func.extract('year', today) - func.extract('year', Employee.ngsinh)
+        ).all()
+        
+        # Calculate age ranges
+        age_ranges = {
+            "18-25": 0,
+            "26-35": 0,
+            "36-45": 0,
+            "46-54": 0
+        }
+        
+        for age_tuple in age_stats:
+            age = age_tuple[0]
+            if age and 18 <= age <= 25:
+                age_ranges["18-25"] += 1
+            elif age and 26 <= age <= 35:
+                age_ranges["26-35"] += 1
+            elif age and 36 <= age <= 45:
+                age_ranges["36-45"] += 1
+            elif age and 46 <= age <= 54:
+                age_ranges["46-54"] += 1
+        
+        # Get recent employees (last 30 days)
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        recent_count = db.query(Employee).filter(
+            Employee.created_at >= thirty_days_ago
+        ).count()
+        
+        return EmployeeStats(
+            total=total,
+            male_count=male_count,
+            female_count=female_count,
+            education_distribution={item.trinhdo: item.count for item in education_stats},
+            age_distribution=age_ranges,
+            recent_additions=recent_count,
+            last_updated=datetime.now()
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting statistics: {str(e)}")
