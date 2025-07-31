@@ -59,9 +59,14 @@ export const employeeAPI = {
   } = {}): Promise<EmployeeListResponse> => {
     const { page = 1, size = 10, search = '' } = params;
     const skip = (page - 1) * size;
+    
+    console.log('🔍 API Request params:', { page, size, search, skip, limit: size });
+    
     const response = await api.get('/employees/', {
       params: { skip, limit: size, search }
     });
+    
+    console.log('📊 API Response:', response.data);
     return response.data;
   },
 
@@ -91,6 +96,12 @@ export const employeeAPI = {
   // Get employee statistics
   getStats: async (): Promise<EmployeeStats> => {
     const response = await api.get('/employees/stats');
+    return response.data;
+  },
+
+  // Debug endpoint
+  debugEmployees: async (): Promise<any> => {
+    const response = await api.get('/employees/debug');
     return response.data;
   },
 };

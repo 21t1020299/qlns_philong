@@ -40,8 +40,8 @@ class EmployeeBase(BaseModel):
     def validate_ngsinh(cls, v):
         today = date.today()
         age = today.year - v.year - ((today.month, today.day) < (v.month, v.day))
-        if age < 18 or age >= 55:
-            raise ValueError('Tuổi phải từ 18-54')
+        if age < 18 or age >= 66:
+            raise ValueError('Tuổi phải từ 18-65')
         return v
 
     @validator('dchi', 'dchithuongtru')

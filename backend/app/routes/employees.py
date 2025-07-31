@@ -133,6 +133,30 @@ def get_employee_stats(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting statistics: {str(e)}")
 
+@router.get("/debug")
+def debug_employees(db: Session = Depends(get_db)):
+    """Debug endpoint to check database state"""
+    try:
+        total_count = db.query(Employee).count()
+        all_employees = db.query(Employee).all()
+        
+        return {
+            "total_count": total_count,
+            "sample_employees": [
+                {
+                    "manv": emp.manv,
+                    "tennv": emp.tennv,
+                    "email": emp.email
+                } for emp in all_employees[:5]
+            ],
+            "database_working": True
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "database_working": False
+        }
+
 @router.get("/{employee_id}", response_model=EmployeeResponse)
 def get_employee(employee_id: str, db: Session = Depends(get_db)):
     """Get employee by ID"""

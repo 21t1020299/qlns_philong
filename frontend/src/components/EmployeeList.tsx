@@ -30,15 +30,30 @@ const EmployeeList: React.FC = () => {
       setLoading(true);
       setError('');
       
+      console.log('🔄 Loading employees with:', { currentPage, pageSize, searchTerm });
+      
       const response = await employeeAPI.getEmployees({
         page: currentPage,
         size: pageSize,
         search: searchTerm
       });
       
+      console.log('✅ Employees loaded:', response);
+      
       setEmployees(response.employees);
-      setTotalPages(Math.ceil(response.total / pageSize));
+      
+      // Validate total and calculate totalPages
+      const total = response.total || 0;
+      const calculatedTotalPages = Math.max(1, Math.ceil(total / pageSize));
+      setTotalPages(calculatedTotalPages);
+      
+      console.log('📊 Updated state:', { 
+        employeesCount: response.employees.length, 
+        total: total, 
+        totalPages: calculatedTotalPages 
+      });
     } catch (err) {
+      console.error('❌ Error loading employees:', err);
       setError('Lỗi tải dữ liệu: ' + (err as Error).message);
     } finally {
       setLoading(false);
@@ -69,6 +84,18 @@ const EmployeeList: React.FC = () => {
     setTimeout(() => setSuccess(''), 3000);
   };
 
+  // Debug function
+  const handleDebug = async () => {
+    try {
+      const debugInfo = await employeeAPI.debugEmployees();
+      console.log('🔍 Debug info:', debugInfo);
+      alert(`Debug info: ${JSON.stringify(debugInfo, null, 2)}`);
+    } catch (err) {
+      console.error('Debug error:', err);
+      alert('Debug error: ' + (err as Error).message);
+    }
+  };
+
   // Handle search
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -78,8 +105,19 @@ const EmployeeList: React.FC = () => {
   // Handle pagination
   const handlePageChange = (delta: number) => {
     const newPage = currentPage + delta;
+    console.log('🔄 Page change requested:', { 
+      currentPage, 
+      delta, 
+      newPage, 
+      totalPages,
+      isValid: newPage >= 1 && newPage <= totalPages 
+    });
+    
     if (newPage >= 1 && newPage <= totalPages) {
+      console.log('✅ Changing to page:', newPage);
       setCurrentPage(newPage);
+    } else {
+      console.log('❌ Invalid page change:', newPage);
     }
   };
 
@@ -227,6 +265,9 @@ const EmployeeList: React.FC = () => {
           <button className="btn btn-success" onClick={handleAddEmployee}>
             ➕ Thêm nhân viên
           </button>
+          <button className="btn btn-info" onClick={handleDebug}>
+            🐛 Debug
+          </button>
         </div>
 
         {/* Messages */}
@@ -317,7 +358,7 @@ const EmployeeList: React.FC = () => {
         )}
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
+        {!loading && (
           <div className="pagination">
             <button
               onClick={() => handlePageChange(-1)}

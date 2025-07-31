@@ -120,8 +120,8 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
         const age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
         const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
-        if (actualAge < 18 || actualAge >= 55) {
-          return 'Tuổi phải từ 18-54';
+        if (actualAge < 18 || actualAge >= 66) {
+          return 'Tuổi phải từ 18-65';
         }
         break;
       
