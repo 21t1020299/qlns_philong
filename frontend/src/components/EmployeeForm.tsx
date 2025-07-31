@@ -105,21 +105,71 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       
       case 'email':
         if (!value.trim()) return 'Email không được để trống';
+        
+        // Kiểm tra ký tự đặc biệt không hợp lệ
+        if (/[<>"']/.test(value)) {
+          return 'Email không được chứa ký tự đặc biệt: < > " \'';
+        }
+        
+        // Kiểm tra format email cơ bản
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(value)) {
+          return 'Email không đúng định dạng';
+        }
+        
+        // Kiểm tra độ dài email
+        if (value.length > 254) {
+          return 'Email quá dài (tối đa 254 ký tự)';
+        }
+        
         const emailParts = value.split('@');
         if (emailParts.length !== 2) return 'Email không hợp lệ';
-        const domainParts = emailParts[1].split('.');
+        
+        const localPart = emailParts[0];
+        const domain = emailParts[1];
+        
+        // Kiểm tra local part
+        if (localPart.length > 64) {
+          return 'Phần trước @ quá dài (tối đa 64 ký tự)';
+        }
+        if (localPart.startsWith('.') || localPart.endsWith('.')) {
+          return 'Phần trước @ không được bắt đầu hoặc kết thúc bằng dấu chấm';
+        }
+        
+        // Kiểm tra domain
+        const domainParts = domain.split('.');
         if (domainParts.length < 2 || domainParts.length > 4) {
-          return 'Domain tối đa 4 cấp';
+          return 'Domain phải có 2-4 phần';
+        }
+        
+        // Kiểm tra TLD
+        const tld = domainParts[domainParts.length - 1];
+        if (tld.length < 2) {
+          return 'Domain cấp cao nhất phải có ít nhất 2 ký tự';
         }
         break;
       
       case 'ngsinh':
         if (!value) return 'Ngày sinh không được để trống';
-        const today = new Date();
+        
         const birthDate = new Date(value);
+        const today = new Date();
+        
+        // Kiểm tra ngày sinh không được trong tương lai
+        if (birthDate > today) {
+          return 'Ngày sinh không được trong tương lai';
+        }
+        
+        // Kiểm tra ngày sinh không được quá xa trong quá khứ
+        if (birthDate.getFullYear() < 1900) {
+          return 'Ngày sinh không hợp lệ (trước năm 1900)';
+        }
+        
+        // Tính tuổi chính xác
         const age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
         const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+        
         if (actualAge < 18 || actualAge >= 66) {
           return 'Tuổi phải từ 18-65';
         }
@@ -129,6 +179,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       case 'dchithuongtru':
         if (!value.trim()) return 'Địa chỉ không được để trống';
         if (value.length > 200) return 'Địa chỉ không được quá 200 ký tự';
+        
+        // Kiểm tra ký tự đặc biệt không hợp lệ
+        if (/[<>"']/.test(value)) {
+          return 'Địa chỉ không được chứa ký tự đặc biệt: < > " \'';
+        }
         break;
       
       case 'hotencha':
@@ -148,6 +203,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       case 'qtich':
       case 'skhoe':
         if (!value.trim()) return 'Trường này không được để trống';
+        
+        // Kiểm tra ký tự đặc biệt không hợp lệ
+        if (/[<>"']/.test(value)) {
+          return 'Trường này không được chứa ký tự đặc biệt: < > " \'';
+        }
         break;
     }
     return '';

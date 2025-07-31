@@ -38,7 +38,16 @@ class EmployeeBase(BaseModel):
 
     @validator('ngsinh')
     def validate_ngsinh(cls, v):
+        # Kiểm tra ngày sinh không được trong tương lai
         today = date.today()
+        if v > today:
+            raise ValueError('Ngày sinh không được trong tương lai')
+        
+        # Kiểm tra ngày sinh không được quá xa trong quá khứ (trước 1900)
+        if v.year < 1900:
+            raise ValueError('Ngày sinh không hợp lệ (trước năm 1900)')
+        
+        # Tính tuổi
         age = today.year - v.year - ((today.month, today.day) < (v.month, v.day))
         if age < 18 or age >= 66:
             raise ValueError('Tuổi phải từ 18-65')
@@ -48,6 +57,9 @@ class EmployeeBase(BaseModel):
     def validate_address(cls, v):
         if len(v) > 200:
             raise ValueError('Địa chỉ không được quá 200 ký tự')
+        # Kiểm tra ký tự đặc biệt không hợp lệ trong địa chỉ
+        if re.search(r'[<>"\']', v):
+            raise ValueError('Địa chỉ không được chứa ký tự đặc biệt: < > " \'')
         return v
 
     @validator('hotencha', 'hotenme')
@@ -60,16 +72,42 @@ class EmployeeBase(BaseModel):
 
     @validator('email')
     def validate_email_domain(cls, v):
+        # Kiểm tra format email cơ bản
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', v):
+            raise ValueError('Email không đúng định dạng')
+        
+        # Kiểm tra ký tự đặc biệt không hợp lệ
+        if re.search(r'[<>"\']', v):
+            raise ValueError('Email không được chứa ký tự đặc biệt: < > " \'')
+        
+        # Kiểm tra độ dài email
+        if len(v) > 254:
+            raise ValueError('Email quá dài (tối đa 254 ký tự)')
+        
         parts = v.split('@')
         if len(parts) != 2:
             raise ValueError('Email không hợp lệ')
         
+        local_part = parts[0]
         domain = parts[1]
+        
+        # Kiểm tra local part
+        if len(local_part) > 64:
+            raise ValueError('Phần trước @ quá dài (tối đa 64 ký tự)')
+        if local_part.startswith('.') or local_part.endswith('.'):
+            raise ValueError('Phần trước @ không được bắt đầu hoặc kết thúc bằng dấu chấm')
+        
+        # Kiểm tra domain
         domain_parts = domain.split('.')
         if len(domain_parts) < 2 or len(domain_parts) > 4:
-            raise ValueError('Domain tối đa 4 cấp')
+            raise ValueError('Domain phải có 2-4 phần')
         
-        return v
+        # Kiểm tra TLD (top-level domain)
+        tld = domain_parts[-1]
+        if len(tld) < 2:
+            raise ValueError('Domain cấp cao nhất phải có ít nhất 2 ký tự')
+        
+        return v.lower()  # Chuyển về lowercase để chuẩn hóa
 
 # Create Employee Schema
 class EmployeeCreate(EmployeeBase):
