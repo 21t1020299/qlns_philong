@@ -24,12 +24,8 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "https://qlns-philong.vercel.app",
         "https://qlns-philong.onrender.com",
-        "https://*.vercel.app",
-        "https://*.onrender.com",
         "https://vercel.app",
-        "https://*.vercel.app/*",
-        "file://",
-        "null"
+        "*"  # Allow all origins for development
     ],
     allow_credentials=True,
     allow_methods=["*"],
