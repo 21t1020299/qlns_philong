@@ -151,6 +151,8 @@ class EmployeeUpdate(BaseModel):
     macv: Optional[str] = None
     hotencha: Optional[str] = None
     hotenme: Optional[str] = None
+    anhchandung: Optional[str] = None
+    anhcmnd: Optional[str] = None
 
 # Employee Response Schema for new employees
 class EmployeeResponse(EmployeeBase):
