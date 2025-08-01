@@ -10,6 +10,7 @@ from app.schemas.employee import (
     EmployeeCreate,
     EmployeeUpdate,
     EmployeeResponse,
+    EmployeeDBResponse,
     EmployeeListResponse,
     EmployeeStats
 )
@@ -68,8 +69,39 @@ def get_employees(
     # Apply pagination
     employees = query.offset(skip).limit(limit).all()
     
+    # Convert to DB response format to avoid strict validation
+    employee_responses = []
+    for emp in employees:
+        try:
+            # Use DB response format for existing data
+            emp_response = EmployeeDBResponse(
+                manv=emp.manv,
+                tennv=emp.tennv,
+                gtinh=emp.gtinh,
+                email=emp.email,
+                sdt=emp.sdt,
+                ngsinh=emp.ngsinh,
+                dchi=emp.dchi,
+                dchithuongtru=emp.dchithuongtru,
+                noidkhktt=emp.noidkhktt,
+                dtoc=emp.dtoc,
+                trinhdo=emp.trinhdo,
+                qtich=emp.qtich,
+                skhoe=emp.skhoe,
+                macv=emp.macv,
+                hotencha=emp.hotencha,
+                hotenme=emp.hotenme,
+                anhchandung=emp.anhchandung,
+                anhcmnd=emp.anhcmnd
+            )
+            employee_responses.append(emp_response)
+        except Exception as e:
+            # Log error but continue with other employees
+            print(f"Error processing employee {emp.manv}: {str(e)}")
+            continue
+    
     return EmployeeListResponse(
-        employees=employees,
+        employees=employee_responses,
         total=total,
         page=skip // limit + 1,
         size=limit
@@ -157,13 +189,37 @@ def debug_employees(db: Session = Depends(get_db)):
             "database_working": False
         }
 
-@router.get("/{employee_id}", response_model=EmployeeResponse)
+@router.get("/{employee_id}", response_model=EmployeeDBResponse)
 def get_employee(employee_id: str, db: Session = Depends(get_db)):
     """Get employee by ID"""
     employee = db.query(Employee).filter(Employee.manv == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
-    return employee
+    
+    # Use DB response format to avoid strict validation
+    try:
+        return EmployeeDBResponse(
+            manv=employee.manv,
+            tennv=employee.tennv,
+            gtinh=employee.gtinh,
+            email=employee.email,
+            sdt=employee.sdt,
+            ngsinh=employee.ngsinh,
+            dchi=employee.dchi,
+            dchithuongtru=employee.dchithuongtru,
+            noidkhktt=employee.noidkhktt,
+            dtoc=employee.dtoc,
+            trinhdo=employee.trinhdo,
+            qtich=employee.qtich,
+            skhoe=employee.skhoe,
+            macv=employee.macv,
+            hotencha=employee.hotencha,
+            hotenme=employee.hotenme,
+            anhchandung=employee.anhchandung,
+            anhcmnd=employee.anhcmnd
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing employee data: {str(e)}")
 
 @router.post("/", response_model=EmployeeResponse, status_code=201)
 def create_employee(employee_data: EmployeeCreate, db: Session = Depends(get_db)):

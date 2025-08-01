@@ -4,7 +4,7 @@ from datetime import date, datetime
 import re
 import uuid
 
-# Base Employee Schema
+# Base Employee Schema for new employees (strict validation)
 class EmployeeBase(BaseModel):
     tennv: str
     gtinh: str
@@ -109,6 +109,27 @@ class EmployeeBase(BaseModel):
         
         return v.lower()  # Chuyển về lowercase để chuẩn hóa
 
+# Employee Schema for loading from database (no strict validation)
+class EmployeeDB(BaseModel):
+    tennv: str
+    gtinh: str
+    email: str  # Use str instead of EmailStr for database data
+    sdt: str
+    ngsinh: date
+    dchi: str
+    dchithuongtru: str
+    noidkhktt: str
+    dtoc: str
+    trinhdo: str
+    qtich: str
+    skhoe: str
+    macv: str
+    hotencha: str
+    hotenme: str
+
+    class Config:
+        from_attributes = True
+
 # Create Employee Schema
 class EmployeeCreate(EmployeeBase):
     pass
@@ -131,8 +152,17 @@ class EmployeeUpdate(BaseModel):
     hotencha: Optional[str] = None
     hotenme: Optional[str] = None
 
-# Employee Response Schema
+# Employee Response Schema for new employees
 class EmployeeResponse(EmployeeBase):
+    manv: str
+    anhchandung: Optional[str] = None
+    anhcmnd: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+# Employee Response Schema for database data
+class EmployeeDBResponse(EmployeeDB):
     manv: str
     anhchandung: Optional[str] = None
     anhcmnd: Optional[str] = None
@@ -142,7 +172,7 @@ class EmployeeResponse(EmployeeBase):
 
 # Employee List Response
 class EmployeeListResponse(BaseModel):
-    employees: list[EmployeeResponse]
+    employees: list[EmployeeDBResponse]  # Use DB response for loading data
     total: int
     page: int
     size: int
