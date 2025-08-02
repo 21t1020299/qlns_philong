@@ -47,6 +47,9 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
     chucvu: []
   });
 
+  // Track if data is loaded from database
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   useEffect(() => {
     // Load options
     const loadOptions = async () => {
@@ -68,26 +71,36 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
   useEffect(() => {
     if (employee) {
       setFormData({
-        tennv: employee.tennv,
-        gtinh: employee.gtinh,
-        email: employee.email,
-        sdt: employee.sdt,
-        ngsinh: employee.ngsinh,
-        dchi: employee.dchi,
-        dchithuongtru: employee.dchithuongtru,
-        noidkhktt: employee.noidkhktt,
-        dtoc: employee.dtoc,
-        trinhdo: employee.trinhdo,
-        qtich: employee.qtich,
-        skhoe: employee.skhoe,
-        macv: employee.macv,
-        hotencha: employee.hotencha,
-        hotenme: employee.hotenme
+        tennv: employee.tennv || '',
+        gtinh: employee.gtinh || '',
+        email: employee.email || '',
+        sdt: employee.sdt || '',
+        ngsinh: employee.ngsinh || '',
+        dchi: employee.dchi || '',
+        dchithuongtru: employee.dchithuongtru || '',
+        noidkhktt: employee.noidkhktt || '',
+        dtoc: employee.dtoc || '',
+        trinhdo: employee.trinhdo || '',
+        qtich: employee.qtich || '',
+        skhoe: employee.skhoe || '',
+        macv: employee.macv || '',
+        hotencha: employee.hotencha || '',
+        hotenme: employee.hotenme || ''
       });
+      setIsDataLoaded(true);
     }
   }, [employee]);
 
-  const validateField = (name: keyof EmployeeFormData, value: string): string => {
+  const validateField = (name: keyof EmployeeFormData, value: string, isFromDB: boolean = false): string => {
+    // If data is loaded from database, skip strict validation for optional fields
+    if (isFromDB && isDataLoaded) {
+      // For optional fields, only validate format if value exists
+      const optionalFields = ['hotencha', 'hotenme', 'dchithuongtru', 'noidkhktt', 'qtich', 'trinhdo', 'skhoe'];
+      if (optionalFields.includes(name)) {
+        if (!value.trim()) return ''; // Allow empty for optional fields
+      }
+    }
+
     switch (name) {
       case 'tennv':
         if (!value.trim()) return 'Họ tên không được để trống';
@@ -152,8 +165,19 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       case 'ngsinh':
         if (!value) return 'Ngày sinh không được để trống';
         
+        // Kiểm tra format Y-M-D
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(value)) {
+          return 'Ngày sinh phải theo định dạng YYYY-MM-DD';
+        }
+        
         const birthDate = new Date(value);
         const today = new Date();
+        
+        // Kiểm tra ngày hợp lệ
+        if (isNaN(birthDate.getTime())) {
+          return 'Ngày sinh không hợp lệ';
+        }
         
         // Kiểm tra ngày sinh không được trong tương lai
         if (birthDate > today) {
@@ -165,18 +189,20 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
           return 'Ngày sinh không hợp lệ (trước năm 1900)';
         }
         
-        // Tính tuổi chính xác
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
-        
-        if (actualAge < 18 || actualAge >= 66) {
-          return 'Tuổi phải từ 18-65';
+        // Chỉ kiểm tra tuổi cho nhân viên mới (không phải nhân viên chính thức)
+        if (!isFromDB || !isDataLoaded) {
+          // Tính tuổi chính xác
+          const age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+          
+          if (actualAge < 18 || actualAge >= 66) {
+            return 'Tuổi phải từ 18-65';
+          }
         }
         break;
       
       case 'dchi':
-      case 'dchithuongtru':
         if (!value.trim()) return 'Địa chỉ không được để trống';
         if (value.length > 200) return 'Địa chỉ không được quá 200 ký tự';
         
@@ -186,26 +212,42 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
         }
         break;
       
+      case 'dchithuongtru':
+        // Optional field - only validate if value exists
+        if (value.trim() && value.length > 200) return 'Địa chỉ không được quá 200 ký tự';
+        if (value.trim() && /[<>"']/.test(value)) {
+          return 'Địa chỉ không được chứa ký tự đặc biệt: < > " \'';
+        }
+        break;
+      
       case 'hotencha':
       case 'hotenme':
-        if (!value.trim()) return 'Họ tên không được để trống';
-        if (!/^[a-zA-ZÀ-ỹ\s-]+$/.test(value)) {
-          return 'Họ tên chỉ được chứa chữ cái';
+        // Optional fields - only validate if value exists
+        if (value.trim()) {
+          if (!/^[a-zA-ZÀ-ỹ\s-]+$/.test(value)) {
+            return 'Họ tên chỉ được chứa chữ cái';
+          }
+          if (value.length > 100) return 'Họ tên không được quá 100 ký tự';
         }
-        if (value.length > 100) return 'Họ tên không được quá 100 ký tự';
         break;
       
       case 'gtinh':
       case 'macv':
-      case 'noidkhktt':
       case 'dtoc':
-      case 'trinhdo':
-      case 'qtich':
-      case 'skhoe':
         if (!value.trim()) return 'Trường này không được để trống';
         
         // Kiểm tra ký tự đặc biệt không hợp lệ
         if (/[<>"']/.test(value)) {
+          return 'Trường này không được chứa ký tự đặc biệt: < > " \'';
+        }
+        break;
+      
+      case 'noidkhktt':
+      case 'trinhdo':
+      case 'qtich':
+      case 'skhoe':
+        // Optional fields - only validate if value exists
+        if (value.trim() && /[<>"']/.test(value)) {
           return 'Trường này không được chứa ký tự đặc biệt: < > " \'';
         }
         break;
@@ -225,7 +267,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const error = validateField(name as keyof EmployeeFormData, value);
+    const error = validateField(name as keyof EmployeeFormData, value, isDataLoaded);
     setErrors(prev => ({ ...prev, [name]: error }));
   };
 
@@ -238,7 +280,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
     
     Object.keys(formData).forEach(key => {
       const fieldName = key as keyof EmployeeFormData;
-      const error = validateField(fieldName, formData[fieldName]);
+      const error = validateField(fieldName, formData[fieldName], isDataLoaded);
       if (error) {
         newErrors[fieldName] = error;
         hasErrors = true;
@@ -331,6 +373,9 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.ngsinh ? 'error' : ''}
+                pattern="\d{4}-\d{2}-\d{2}"
+                placeholder="YYYY-MM-DD"
+                title="Vui lòng nhập ngày sinh theo định dạng YYYY-MM-DD"
               />
               {errors.ngsinh && <span className="error-message">{errors.ngsinh}</span>}
             </div>
@@ -370,7 +415,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="dchithuongtru">Địa chỉ thường trú <span className="required">*</span></label>
+              <label htmlFor="dchithuongtru">Địa chỉ thường trú</label>
               <textarea
                 id="dchithuongtru"
                 name="dchithuongtru"
@@ -379,12 +424,13 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onBlur={handleBlur}
                 rows={3}
                 className={errors.dchithuongtru ? 'error' : ''}
+                placeholder="Không bắt buộc"
               />
               {errors.dchithuongtru && <span className="error-message">{errors.dchithuongtru}</span>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="noidkhktt">Nơi đăng ký HKTT <span className="required">*</span></label>
+              <label htmlFor="noidkhktt">Nơi đăng ký HKTT</label>
               <input
                 type="text"
                 id="noidkhktt"
@@ -393,6 +439,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.noidkhktt ? 'error' : ''}
+                placeholder="Không bắt buộc"
               />
               {errors.noidkhktt && <span className="error-message">{errors.noidkhktt}</span>}
             </div>
@@ -418,7 +465,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="trinhdo">Trình độ <span className="required">*</span></label>
+              <label htmlFor="trinhdo">Trình độ</label>
               <select
                 id="trinhdo"
                 name="trinhdo"
@@ -427,7 +474,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onBlur={handleBlur}
                 className={errors.trinhdo ? 'error' : ''}
               >
-                <option value="">Chọn trình độ</option>
+                <option value="">Chọn trình độ (không bắt buộc)</option>
                 <option value="Trung cấp">Trung cấp</option>
                 <option value="Cao đẳng">Cao đẳng</option>
                 <option value="Đại học">Đại học</option>
@@ -437,7 +484,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="qtich">Quốc tịch <span className="required">*</span></label>
+              <label htmlFor="qtich">Quốc tịch</label>
               <select
                 id="qtich"
                 name="qtich"
@@ -446,7 +493,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onBlur={handleBlur}
                 className={errors.qtich ? 'error' : ''}
               >
-                <option value="">Chọn quốc tịch</option>
+                <option value="">Chọn quốc tịch (không bắt buộc)</option>
                 {options.quoctich.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -457,7 +504,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="skhoe">Sức khỏe <span className="required">*</span></label>
+              <label htmlFor="skhoe">Sức khỏe</label>
               <select
                 id="skhoe"
                 name="skhoe"
@@ -466,7 +513,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onBlur={handleBlur}
                 className={errors.skhoe ? 'error' : ''}
               >
-                <option value="">Chọn tình trạng sức khỏe</option>
+                <option value="">Chọn tình trạng sức khỏe (không bắt buộc)</option>
                 {options.suckhoe.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -477,7 +524,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="hotencha">Họ tên cha <span className="required">*</span></label>
+              <label htmlFor="hotencha">Họ tên cha</label>
               <input
                 type="text"
                 id="hotencha"
@@ -486,12 +533,13 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.hotencha ? 'error' : ''}
+                placeholder="Không bắt buộc"
               />
               {errors.hotencha && <span className="error-message">{errors.hotencha}</span>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="hotenme">Họ tên mẹ <span className="required">*</span></label>
+              <label htmlFor="hotenme">Họ tên mẹ</label>
               <input
                 type="text"
                 id="hotenme"
@@ -500,6 +548,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.hotenme ? 'error' : ''}
+                placeholder="Không bắt buộc"
               />
               {errors.hotenme && <span className="error-message">{errors.hotenme}</span>}
             </div>
