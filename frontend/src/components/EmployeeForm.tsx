@@ -290,6 +290,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
     setErrors(newErrors);
     
     if (!hasErrors) {
+      // type="date" automatically provides YYYY-MM-DD format
       onSubmit(formData);
     }
   };
