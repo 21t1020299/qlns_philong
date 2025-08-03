@@ -117,6 +117,42 @@
   font-family: inherit;
 }
 
+/* Override default placeholder for date input */
+.form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-text {
+  color: #6c757d;
+  padding: 0 2px;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #495057;
+}
+
+/* Show placeholder when empty */
+.form-group input[type="date"]:not([value])::-webkit-datetime-edit {
+  color: #6c757d;
+}
+
+.form-group input[type="date"]:not([value])::-webkit-datetime-edit-month-field::before {
+  content: "YYYY";
+  color: #6c757d;
+}
+
+.form-group input[type="date"]:not([value])::-webkit-datetime-edit-day-field::before {
+  content: "MM";
+  color: #6c757d;
+}
+
+.form-group input[type="date"]:not([value])::-webkit-datetime-edit-year-field::before {
+  content: "DD";
+  color: #6c757d;
+}
+
 .form-group input[type="date"]::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;
@@ -131,21 +167,6 @@
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit {
-  color: #495057;
-}
-
-.form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  padding: 0;
-}
-
-.form-group input[type="date"]::-webkit-datetime-edit-text {
-  color: #6c757d;
-  padding: 0 2px;
-}
-
-.form-group input[type="date"]::-webkit-datetime-edit-month-field,
-.form-group input[type="date"]::-webkit-datetime-edit-day-field,
-.form-group input[type="date"]::-webkit-datetime-edit-year-field {
   color: #495057;
 }
 
