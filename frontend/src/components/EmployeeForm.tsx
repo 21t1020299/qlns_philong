@@ -366,17 +366,17 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             <div className="form-group">
               <label htmlFor="ngsinh">Ngày sinh <span className="required">*</span></label>
               <input
-                type="text"
+                type="date"
                 id="ngsinh"
                 name="ngsinh"
                 value={formData.ngsinh}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.ngsinh ? 'error' : ''}
-                pattern="\d{4}-\d{2}-\d{2}"
-                placeholder="YYYY-MM-DD"
-                title="Vui lòng nhập ngày sinh theo định dạng YYYY-MM-DD"
+                max={new Date().toISOString().split('T')[0]}
+                title="Vui lòng chọn ngày sinh (định dạng YYYY-MM-DD)"
               />
+              <small className="form-text">Định dạng: YYYY-MM-DD</small>
               {errors.ngsinh && <span className="error-message">{errors.ngsinh}</span>}
             </div>
 
