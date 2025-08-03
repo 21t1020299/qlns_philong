@@ -165,17 +165,22 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
       case 'ngsinh':
         if (!value) return 'Ngày sinh không được để trống';
         
-        // Kiểm tra format Y-M-D
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        // Kiểm tra format DD/MM/YYYY
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
         if (!dateRegex.test(value)) {
-          return 'Ngày sinh phải theo định dạng YYYY-MM-DD';
+          return 'Ngày sinh phải theo định dạng DD/MM/YYYY';
         }
         
-        const birthDate = new Date(value);
+        // Parse date từ DD/MM/YYYY
+        const [day, month, year] = value.split('/').map(Number);
+        const birthDate = new Date(year, month - 1, day);
         const today = new Date();
         
         // Kiểm tra ngày hợp lệ
-        if (isNaN(birthDate.getTime())) {
+        if (isNaN(birthDate.getTime()) || 
+            birthDate.getDate() !== day || 
+            birthDate.getMonth() !== month - 1 || 
+            birthDate.getFullYear() !== year) {
           return 'Ngày sinh không hợp lệ';
         }
         
@@ -185,7 +190,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
         }
         
         // Kiểm tra ngày sinh không được quá xa trong quá khứ
-        if (birthDate.getFullYear() < 1900) {
+        if (year < 1900) {
           return 'Ngày sinh không hợp lệ (trước năm 1900)';
         }
         
@@ -366,16 +371,16 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             <div className="form-group">
               <label htmlFor="ngsinh">Ngày sinh <span className="required">*</span></label>
               <input
-                type="date"
+                type="text"
                 id="ngsinh"
                 name="ngsinh"
                 value={formData.ngsinh}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.ngsinh ? 'error' : ''}
-                pattern="\d{4}-\d{2}-\d{2}"
-                placeholder="YYYY-MM-DD"
-                title="Vui lòng nhập ngày sinh theo định dạng YYYY-MM-DD"
+                pattern="\d{2}/\d{2}/\d{4}"
+                placeholder="DD/MM/YYYY"
+                title="Vui lòng nhập ngày sinh theo định dạng DD/MM/YYYY"
               />
               {errors.ngsinh && <span className="error-message">{errors.ngsinh}</span>}
             </div>
