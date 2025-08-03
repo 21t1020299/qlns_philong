@@ -366,7 +366,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({
             <div className="form-group">
               <label htmlFor="ngsinh">Ngày sinh <span className="required">*</span></label>
               <input
-                type="date"
+                type="text"
                 id="ngsinh"
                 name="ngsinh"
                 value={formData.ngsinh}
