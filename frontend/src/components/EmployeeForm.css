@@ -250,6 +250,51 @@
   background: #e9ecef;
 }
 
+/* Custom date input with placeholder */
+.date-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.date-input-wrapper input[type="date"] {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+.date-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+/* Hide default date input styling when placeholder is shown */
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: transparent;
+}
+
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit-text {
+  color: transparent;
+}
+
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit-month-field,
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit-day-field,
+.date-input-wrapper:has(.date-placeholder) input[type="date"]::-webkit-datetime-edit-year-field {
+  color: transparent;
+}
+
 @media (max-width: 768px) {
   .employee-form-overlay {
     padding: 10px;
