@@ -49,20 +49,24 @@ def generate_employee_id(db: Session) -> str:
 ```
 
 ### 1.3 Tính toán Độ phức tạp Cyclomatic
-- **E (Cạnh):** 8
+- **E (Cạnh):** 10
 - **N (Nút):** 9
-- **V(G) = E - N + 2 = 8 - 9 + 2 = 1**
+- **V(G) = E - N + 2 = 10 - 9 + 2 = 3**
 
-**Số đường kiểm thử độc lập:** 1
+**Số đường kiểm thử độc lập:** 3
 
 ### 1.4 Đường Kiểm thử
 1. **Đường 1:** 1 → 2 → 3 → 9 (Cơ sở dữ liệu trống)
+2. **Đường 2:** 1 → 2 → 4 → 5 → 6 → 7 → 9 (Thành công)
+3. **Đường 3:** 1 → 2 → 4 → 5 → 8 → 9 (Có ngoại lệ)
 
 ### 1.5 Bảng Trường hợp Kiểm thử
 
 | Đường kiểm thử | Giá trị đầu vào | Kết quả mong đợi |
 |----------------|-----------------|-------------------|
 | 1.2.3.9 | `last_employee = None` | `"NV001"` |
+| 1.2.4.5.6.7.9 | `last_employee.manv = "NV001"` | `"NV002"` |
+| 1.2.4.5.8.9 | `last_employee.manv = "NVABC"` | `"NV123456"` (UUID) |
 
 ---
 
@@ -566,7 +570,7 @@ return '';
 ## 9. Tổng kết Coverage
 
 ### 9.1 Hàm Backend
-- **generate_employee_id:** 1 đường, 1 trường hợp kiểm thử
+- **generate_employee_id:** 3 đường, 3 trường hợp kiểm thử
 - **create_employee:** 2 đường, 2 trường hợp kiểm thử
 - **validate_email_domain:** 9 đường, 9 trường hợp kiểm thử ⭐ **PHỨC TẠP NHẤT**
 - **validate_tennv:** 3 đường, 3 trường hợp kiểm thử
@@ -578,7 +582,7 @@ return '';
 - **validateField (ngsinh):** 5 đường, 5 trường hợp kiểm thử
 
 ### 9.3 Tổng cộng
-- **Tổng Trường hợp Kiểm thử:** 31
+- **Tổng Trường hợp Kiểm thử:** 33
 - **Branch Coverage:** 100%
 - **Statement Coverage:** 100%
 - **Path Coverage:** 100%
