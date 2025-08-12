@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Employee, EmployeeFormData, EmployeeStats } from '../types/employee';
 import { employeeAPI } from '../services/api';
 import EmployeeForm from './EmployeeForm';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import EmployeeDetailModal from './EmployeeDetailModal';
 import './EmployeeList.css';
 
 const EmployeeList: React.FC = () => {
@@ -23,6 +25,14 @@ const EmployeeList: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | undefined>();
   const [formLoading, setFormLoading] = useState(false);
+  
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{id: string, name: string} | null>(null);
+  
+  // Detail modal state
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   // Load employees
   const loadEmployees = async () => {
@@ -161,82 +171,60 @@ const EmployeeList: React.FC = () => {
     }
   };
 
-  // Handle delete employee with safe confirmation
-  const handleDeleteEmployee = async (manv: string, employeeName: string) => {
-    // First confirmation
-    if (!window.confirm(`⚠️ Bạn có chắc muốn xóa nhân viên ${manv} - ${employeeName}?`)) {
-      return;
-    }
+  // Handle delete employee with beautiful modal
+  const handleDeleteEmployee = (manv: string, employeeName: string) => {
+    setDeleteTarget({ id: manv, name: employeeName });
+    setShowDeleteModal(true);
+  };
 
-    // Second confirmation with keyword requirement
-    const confirmationText = prompt(
-      `🚨 XÁC NHẬN XÓA NHÂN VIÊN 🚨\n\n` +
-      `📋 Thông tin nhân viên:\n` +
-      `   • Mã nhân viên: ${manv}\n` +
-      `   • Họ tên: ${employeeName}\n\n` +
-      `⚠️  CẢNH BÁO QUAN TRỌNG:\n` +
-      `   • Hành động này sẽ xóa vĩnh viễn nhân viên khỏi hệ thống\n` +
-      `   • Dữ liệu đã xóa KHÔNG THỂ KHÔI PHỤC\n` +
-      `   • Tất cả thông tin liên quan sẽ bị mất\n\n` +
-      `🔐 XÁC NHẬN AN TOÀN:\n` +
-      `   Để xác nhận bạn hiểu rõ hậu quả và muốn tiếp tục,\n` +
-      `   vui lòng nhập chính xác từ khóa: "TÔI HIỂU"\n\n` +
-      `📝 Nhập từ khóa xác nhận:`,
-      ""
-    );
-
-    if (confirmationText !== "TÔI HIỂU") {
-      alert(
-        `❌ XÁC NHẬN KHÔNG ĐÚNG!\n\n` +
-        `Bạn đã nhập: "${confirmationText || '(không có gì)'}"\n\n` +
-        `Từ khóa xác nhận phải chính xác là: "TÔI HIỂU"\n\n` +
-        `🚫 Hành động xóa đã bị hủy để đảm bảo an toàn.`
-      );
-      return;
-    }
+  // Handle delete confirmation from modal
+  const handleDeleteConfirm = async (confirmation: string) => {
+    if (!deleteTarget) return;
 
     try {
-      await employeeAPI.deleteEmployee(manv, "TÔI HIỂU");
-      setSuccess(`✅ Xóa nhân viên ${manv} - ${employeeName} thành công!`);
+      await employeeAPI.deleteEmployee(deleteTarget.id, confirmation);
+      setSuccess(`✅ Xóa nhân viên ${deleteTarget.id} - ${deleteTarget.name} thành công!`);
+      
       // Check if current page will be empty after deletion
       if (employees.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
+      
       // Reload data after deletion
       await loadEmployees();
       await loadStats();
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
     } catch (err) {
       setError('❌ Lỗi xóa nhân viên: ' + (err as Error).message);
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
     }
+  };
+
+  // Handle delete modal close
+  const handleDeleteModalClose = () => {
+    setShowDeleteModal(false);
+    setDeleteTarget(null);
   };
 
   // View employee details
   const handleViewEmployee = async (manv: string) => {
     try {
       const employee = await employeeAPI.getEmployee(manv);
-      const details = `
-🏢 Chi tiết nhân viên: ${employee.manv}
-
-👤 Họ tên: ${employee.tennv}
-🚻 Giới tính: ${employee.gtinh}
-📧 Email: ${employee.email}
-📱 SĐT: ${employee.sdt}
-🎂 Ngày sinh: ${employee.ngsinh}
-🏠 Địa chỉ: ${employee.dchi}
-🏘️ Thường trú: ${employee.dchithuongtru}
-📍 HKTT: ${employee.noidkhktt}
-👨‍👩‍👧‍👦 Dân tộc: ${employee.dtoc}
-🎓 Trình độ: ${employee.trinhdo}
-🌍 Quốc tịch: ${employee.qtich}
-💪 Sức khỏe: ${employee.skhoe}
-💼 Chức vụ: ${employee.macv}
-👨 Họ tên cha: ${employee.hotencha}
-👩 Họ tên mẹ: ${employee.hotenme}
-      `;
-      alert(details);
+      setSelectedEmployee(employee);
+      setShowDetailModal(true);
     } catch (err) {
       setError('Lỗi xem chi tiết: ' + (err as Error).message);
     }
+  };
+
+  // Handle detail modal close
+  const handleDetailModalClose = () => {
+    setShowDetailModal(false);
+    setSelectedEmployee(null);
   };
 
   // Clear messages
@@ -416,6 +404,26 @@ const EmployeeList: React.FC = () => {
           onSubmit={handleFormSubmit}
           onCancel={() => setShowForm(false)}
           isLoading={formLoading}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && deleteTarget && (
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={handleDeleteModalClose}
+          onConfirm={handleDeleteConfirm}
+          employeeId={deleteTarget.id}
+          employeeName={deleteTarget.name}
+        />
+      )}
+
+      {/* Employee Detail Modal */}
+      {showDetailModal && selectedEmployee && (
+        <EmployeeDetailModal
+          isOpen={showDetailModal}
+          onClose={handleDetailModalClose}
+          employee={selectedEmployee}
         />
       )}
     </div>

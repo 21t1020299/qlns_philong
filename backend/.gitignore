@@ -54,4 +54,13 @@ uploads/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Test files
+*_test.py
+test_*.py
+simple_test.py
+tests/
+*.test.js
+test_*.js
+simple_test.js 
