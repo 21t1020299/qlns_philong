@@ -161,15 +161,43 @@ const EmployeeList: React.FC = () => {
     }
   };
 
-  // Handle delete employee
-  const handleDeleteEmployee = async (manv: string) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa nhân viên ${manv}?`)) {
+  // Handle delete employee with safe confirmation
+  const handleDeleteEmployee = async (manv: string, employeeName: string) => {
+    // First confirmation
+    if (!window.confirm(`⚠️ Bạn có chắc muốn xóa nhân viên ${manv} - ${employeeName}?`)) {
+      return;
+    }
+
+    // Second confirmation with keyword requirement
+    const confirmationText = prompt(
+      `🚨 XÁC NHẬN XÓA NHÂN VIÊN 🚨\n\n` +
+      `📋 Thông tin nhân viên:\n` +
+      `   • Mã nhân viên: ${manv}\n` +
+      `   • Họ tên: ${employeeName}\n\n` +
+      `⚠️  CẢNH BÁO QUAN TRỌNG:\n` +
+      `   • Hành động này sẽ xóa vĩnh viễn nhân viên khỏi hệ thống\n` +
+      `   • Dữ liệu đã xóa KHÔNG THỂ KHÔI PHỤC\n` +
+      `   • Tất cả thông tin liên quan sẽ bị mất\n\n` +
+      `🔐 XÁC NHẬN AN TOÀN:\n` +
+      `   Để xác nhận bạn hiểu rõ hậu quả và muốn tiếp tục,\n` +
+      `   vui lòng nhập chính xác từ khóa: "TÔI HIỂU"\n\n` +
+      `📝 Nhập từ khóa xác nhận:`,
+      ""
+    );
+
+    if (confirmationText !== "TÔI HIỂU") {
+      alert(
+        `❌ XÁC NHẬN KHÔNG ĐÚNG!\n\n` +
+        `Bạn đã nhập: "${confirmationText || '(không có gì)'}"\n\n` +
+        `Từ khóa xác nhận phải chính xác là: "TÔI HIỂU"\n\n` +
+        `🚫 Hành động xóa đã bị hủy để đảm bảo an toàn.`
+      );
       return;
     }
 
     try {
-      await employeeAPI.deleteEmployee(manv);
-      setSuccess('Xóa nhân viên thành công!');
+      await employeeAPI.deleteEmployee(manv, "TÔI HIỂU");
+      setSuccess(`✅ Xóa nhân viên ${manv} - ${employeeName} thành công!`);
       // Check if current page will be empty after deletion
       if (employees.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -178,7 +206,7 @@ const EmployeeList: React.FC = () => {
       await loadEmployees();
       await loadStats();
     } catch (err) {
-      setError('Lỗi xóa nhân viên: ' + (err as Error).message);
+      setError('❌ Lỗi xóa nhân viên: ' + (err as Error).message);
     }
   };
 
@@ -343,7 +371,7 @@ const EmployeeList: React.FC = () => {
                         </button>
                         <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteEmployee(employee.manv)}
+                          onClick={() => handleDeleteEmployee(employee.manv, employee.tennv)}
                           title="Xóa"
                         >
                           🗑️

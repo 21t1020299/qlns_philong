@@ -89,8 +89,10 @@ export const employeeAPI = {
   },
 
   // Delete employee
-  deleteEmployee: async (manv: string): Promise<void> => {
-    await api.delete(`/employees/${manv}`);
+  deleteEmployee: async (manv: string, confirmation: string): Promise<void> => {
+    await api.delete(`/employees/${manv}`, {
+      params: { confirmation }
+    });
   },
 
   // Get employee statistics

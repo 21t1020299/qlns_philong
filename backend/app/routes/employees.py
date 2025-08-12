@@ -272,12 +272,36 @@ def update_employee(
     return employee
 
 @router.delete("/{employee_id}", status_code=204)
-def delete_employee(employee_id: str, db: Session = Depends(get_db)):
-    """Delete employee"""
+def delete_employee(
+    employee_id: str, 
+    confirmation: str = Query(..., description="Xác nhận xóa bằng cách nhập 'TÔI HIỂU'"),
+    db: Session = Depends(get_db)
+):
+    """Delete employee with confirmation"""
+    # Validate confirmation text
+    if confirmation != "TÔI HIỂU":
+        raise HTTPException(
+            status_code=400, 
+            detail="Xác nhận không đúng. Vui lòng nhập 'TÔI HIỂU' để xác nhận xóa."
+        )
+    
+    # Check if employee exists
     employee = db.query(Employee).filter(Employee.manv == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
+    # Additional safety check - prevent deletion of last employee
+    total_employees = db.query(Employee).count()
+    if total_employees <= 1:
+        raise HTTPException(
+            status_code=400, 
+            detail="Không thể xóa nhân viên cuối cùng trong hệ thống."
+        )
+    
+    # Log deletion for audit trail
+    print(f"⚠️ DELETING EMPLOYEE: {employee.manv} - {employee.tennv} - {employee.email}")
+    
+    # Perform deletion
     db.delete(employee)
     db.commit()
     
