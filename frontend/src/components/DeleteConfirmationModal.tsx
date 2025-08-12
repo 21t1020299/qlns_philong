@@ -74,15 +74,11 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             <div className="warning-list">
               <div className="warning-item">
                 <span className="warning-icon">🗑️</span>
-                <span>Hành động này sẽ xóa vĩnh viễn nhân viên khỏi hệ thống</span>
+                <span>Xóa vĩnh viễn nhân viên khỏi hệ thống</span>
               </div>
               <div className="warning-item">
                 <span className="warning-icon">❌</span>
-                <span>Dữ liệu đã xóa KHÔNG THỂ KHÔI PHỤC</span>
-              </div>
-              <div className="warning-item">
-                <span className="warning-icon">💾</span>
-                <span>Tất cả thông tin liên quan sẽ bị mất</span>
+                <span>Dữ liệu KHÔNG THỂ KHÔI PHỤC</span>
               </div>
             </div>
           </div>
@@ -91,8 +87,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
           <div className="confirmation-section">
             <h3>🔐 Xác nhận an toàn</h3>
             <p className="confirmation-instruction">
-              Để xác nhận bạn hiểu rõ hậu quả và muốn tiếp tục,<br />
-              vui lòng nhập chính xác từ khóa: <strong>"TÔI HIỂU"</strong>
+              Để xác nhận, vui lòng nhập chính xác: <strong>"TÔI HIỂU"</strong>
             </p>
             
             <div className="input-group">

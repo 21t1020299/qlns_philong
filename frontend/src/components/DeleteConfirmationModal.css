@@ -19,9 +19,9 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
+  max-width: 500px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 80vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
   border: 1px solid #e9ecef;
@@ -74,12 +74,12 @@
 
 /* Modal Body */
 .modal-body {
-  padding: 30px;
+  padding: 20px;
 }
 
 /* Employee Info Section */
 .employee-info {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .info-section h3 {
@@ -94,7 +94,7 @@
 .info-grid {
   background: #f8f9fa;
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
   border: 1px solid #e9ecef;
 }
 
@@ -127,7 +127,7 @@
 
 /* Warning Section */
 .warning-section {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .warning-section h3 {
@@ -143,14 +143,14 @@
   background: #fff5f5;
   border: 2px solid #fed7d7;
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
 }
 
 .warning-item {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 8px 0;
+  margin-bottom: 8px;
+  padding: 6px 0;
 }
 
 .warning-item:last-child {
@@ -187,11 +187,11 @@
 .confirmation-instruction {
   color: #495057;
   font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  line-height: 1.5;
+  margin-bottom: 15px;
   text-align: center;
   background: #f8f9fa;
-  padding: 15px;
+  padding: 12px;
   border-radius: 8px;
   border-left: 4px solid #007bff;
 }

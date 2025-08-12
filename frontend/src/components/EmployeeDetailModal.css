@@ -19,9 +19,9 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 800px;
+  max-width: 700px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
   border: 1px solid #e9ecef;
@@ -74,15 +74,15 @@
 
 /* Detail Modal Body */
 .detail-modal-body {
-  padding: 30px;
+  padding: 20px;
 }
 
 /* Employee Avatar Section */
 .employee-avatar-section {
   display: flex;
   align-items: center;
-  margin-bottom: 30px;
-  padding: 20px;
+  margin-bottom: 20px;
+  padding: 15px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 15px;
   border: 1px solid #dee2e6;
@@ -156,8 +156,8 @@
 
 /* Detail Sections */
 .detail-section {
-  margin-bottom: 25px;
-  padding: 20px;
+  margin-bottom: 15px;
+  padding: 15px;
   background: white;
   border-radius: 12px;
   border: 1px solid #e9ecef;
@@ -184,7 +184,7 @@
 .detail-item {
   display: flex;
   flex-direction: column;
-  padding: 12px 0;
+  padding: 8px 0;
 }
 
 .detail-item.full-width {
