@@ -1,0 +1,240 @@
+/* Error Modal Overlay */
+.error-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Error Modal Content */
+.error-modal-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 450px;
+  width: 90%;
+  padding: 30px;
+  text-align: center;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+
+/* Error Icon */
+.error-icon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.error-symbol {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(231, 76, 60, 0.1);
+  border: 3px solid currentColor;
+  animation: pulse 2s infinite;
+}
+
+.error-emoji {
+  font-size: 40px;
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Error Title */
+.error-title {
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  animation: slideUp 0.5s ease-out 0.3s both;
+}
+
+/* Error Message */
+.error-message {
+  color: #495057;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+  animation: slideUp 0.5s ease-out 0.4s both;
+}
+
+/* Error Type Badge */
+.error-type-badge {
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 20px;
+  animation: slideUp 0.5s ease-out 0.5s both;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Error Modal Footer */
+.error-modal-footer {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  animation: slideUp 0.5s ease-out 0.6s both;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-error {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.btn-error:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+}
+
+/* Auto-close Indicator */
+.auto-close-indicator {
+  margin-top: 15px;
+  animation: slideUp 0.5s ease-out 0.7s both;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill.error {
+  height: 100%;
+  border-radius: 2px;
+  animation: progressFillError 5s linear forwards;
+}
+
+.auto-close-text {
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes progressFillError {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .error-modal-content {
+    width: 95%;
+    margin: 20px;
+    padding: 25px;
+  }
+  
+  .error-title {
+    font-size: 20px;
+  }
+  
+  .error-message {
+    font-size: 14px;
+  }
+  
+  .error-symbol {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .error-emoji {
+    font-size: 30px;
+  }
+  
+  .error-modal-footer {
+    flex-direction: column;
+  }
+}

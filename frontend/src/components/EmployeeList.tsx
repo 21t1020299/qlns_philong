@@ -5,6 +5,7 @@ import EmployeeForm from './EmployeeForm';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import EmployeeDetailModal from './EmployeeDetailModal';
 import SuccessModal from './SuccessModal';
+import ErrorModal from './ErrorModal';
 import './EmployeeList.css';
 
 const EmployeeList: React.FC = () => {
@@ -42,6 +43,34 @@ const EmployeeList: React.FC = () => {
     message: string;
     employeeInfo?: { id: string; name: string; email: string };
   } | null>(null);
+  
+  // Error modal state
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorInfo, setErrorInfo] = useState<{
+    title: string;
+    message: string;
+    errorType: 'validation' | 'network' | 'server' | 'general';
+  } | null>(null);
+
+  // Helper function to determine error type
+  const getErrorType = (errorMessage: string): 'validation' | 'network' | 'server' | 'general' => {
+    const message = errorMessage.toLowerCase();
+    if (message.includes('validation') || message.includes('validation')) {
+      return 'validation';
+    } else if (message.includes('kết nối') || message.includes('network') || message.includes('connection')) {
+      return 'network';
+    } else if (message.includes('server') || message.includes('500') || message.includes('502')) {
+      return 'server';
+    }
+    return 'general';
+  };
+
+  // Helper function to show error modal
+  const displayErrorModal = (title: string, message: string) => {
+    const errorType = getErrorType(message);
+    setErrorInfo({ title, message, errorType });
+    setShowErrorModal(true);
+  };
 
   // Load employees
   const loadEmployees = async () => {
@@ -73,7 +102,7 @@ const EmployeeList: React.FC = () => {
       });
     } catch (err) {
       console.error('❌ Error loading employees:', err);
-      setError('Lỗi tải dữ liệu: ' + (err as Error).message);
+      displayErrorModal('❌ Lỗi tải dữ liệu', 'Lỗi tải dữ liệu: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -86,6 +115,7 @@ const EmployeeList: React.FC = () => {
       setStats(statsData);
     } catch (err) {
       console.error('Error loading stats:', err);
+      displayErrorModal('❌ Lỗi tải thống kê', 'Không thể tải dữ liệu thống kê: ' + (err as Error).message);
     }
   };
 
@@ -191,7 +221,7 @@ const EmployeeList: React.FC = () => {
       await loadEmployees();
       await loadStats();
     } catch (err) {
-      setError('Lỗi: ' + (err as Error).message);
+      displayErrorModal('❌ Lỗi thao tác', 'Lỗi: ' + (err as Error).message);
     } finally {
       setFormLoading(false);
     }
@@ -224,7 +254,7 @@ const EmployeeList: React.FC = () => {
       setShowDeleteModal(false);
       setDeleteTarget(null);
     } catch (err) {
-      setError('❌ Lỗi xóa nhân viên: ' + (err as Error).message);
+      displayErrorModal('❌ Lỗi xóa nhân viên', '❌ Lỗi xóa nhân viên: ' + (err as Error).message);
       setShowDeleteModal(false);
       setDeleteTarget(null);
     }
@@ -243,7 +273,7 @@ const EmployeeList: React.FC = () => {
       setSelectedEmployee(employee);
       setShowDetailModal(true);
     } catch (err) {
-      setError('Lỗi xem chi tiết: ' + (err as Error).message);
+      displayErrorModal('❌ Lỗi xem chi tiết', 'Lỗi xem chi tiết: ' + (err as Error).message);
     }
   };
 
@@ -257,6 +287,12 @@ const EmployeeList: React.FC = () => {
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
     setSuccessInfo(null);
+  };
+
+  // Handle error modal close
+  const handleErrorModalClose = () => {
+    setShowErrorModal(false);
+    setErrorInfo(null);
   };
 
   // Clear messages
@@ -467,6 +503,17 @@ const EmployeeList: React.FC = () => {
           title={successInfo.title}
           message={successInfo.message}
           employeeInfo={successInfo.employeeInfo}
+        />
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && errorInfo && (
+        <ErrorModal
+          isOpen={showErrorModal}
+          onClose={handleErrorModalClose}
+          title={errorInfo.title}
+          message={errorInfo.message}
+          errorType={errorInfo.errorType}
         />
       )}
     </div>
