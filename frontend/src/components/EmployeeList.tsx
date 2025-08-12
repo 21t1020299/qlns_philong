@@ -4,6 +4,7 @@ import { employeeAPI } from '../services/api';
 import EmployeeForm from './EmployeeForm';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import EmployeeDetailModal from './EmployeeDetailModal';
+import SuccessModal from './SuccessModal';
 import './EmployeeList.css';
 
 const EmployeeList: React.FC = () => {
@@ -33,6 +34,14 @@ const EmployeeList: React.FC = () => {
   // Detail modal state
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  
+  // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successInfo, setSuccessInfo] = useState<{
+    title: string;
+    message: string;
+    employeeInfo?: { id: string; name: string; email: string };
+  } | null>(null);
 
   // Load employees
   const loadEmployees = async () => {
@@ -151,16 +160,33 @@ const EmployeeList: React.FC = () => {
       if (editingEmployee) {
         // Update employee
         await employeeAPI.updateEmployee(editingEmployee.manv, formData);
-        setSuccess('Cập nhật nhân viên thành công!');
+        setSuccessInfo({
+          title: '✅ Cập nhật thành công!',
+          message: 'Thông tin nhân viên đã được cập nhật thành công.',
+          employeeInfo: {
+            id: editingEmployee.manv,
+            name: editingEmployee.tennv,
+            email: editingEmployee.email
+          }
+        });
       } else {
         // Add new employee
-        await employeeAPI.createEmployee(formData);
-        setSuccess('Thêm nhân viên thành công!');
+        const newEmployee = await employeeAPI.createEmployee(formData);
+        setSuccessInfo({
+          title: '🎉 Thêm nhân viên thành công!',
+          message: 'Nhân viên mới đã được thêm vào hệ thống.',
+          employeeInfo: {
+            id: newEmployee.manv,
+            name: newEmployee.tennv,
+            email: newEmployee.email
+          }
+        });
         // Reset to first page when adding new employee
         setCurrentPage(1);
       }
       
       setShowForm(false);
+      setShowSuccessModal(true);
       // Reload data after form submission
       await loadEmployees();
       await loadStats();
@@ -225,6 +251,12 @@ const EmployeeList: React.FC = () => {
   const handleDetailModalClose = () => {
     setShowDetailModal(false);
     setSelectedEmployee(null);
+  };
+
+  // Handle success modal close
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setSuccessInfo(null);
   };
 
   // Clear messages
@@ -424,6 +456,17 @@ const EmployeeList: React.FC = () => {
           isOpen={showDetailModal}
           onClose={handleDetailModalClose}
           employee={selectedEmployee}
+        />
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && successInfo && (
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleSuccessModalClose}
+          title={successInfo.title}
+          message={successInfo.message}
+          employeeInfo={successInfo.employeeInfo}
         />
       )}
     </div>
