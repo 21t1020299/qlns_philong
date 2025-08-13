@@ -567,34 +567,236 @@ return '';
 
 ---
 
-## 9. Tổng kết Coverage
+## 8. Hàm Backend: `delete_employee` (Xóa nhân viên)
 
-### 9.1 Hàm Backend
+### 8.1 Phân tích Mã
+```python
+@router.delete("/{employee_id}", status_code=204)
+def delete_employee(
+    employee_id: str, 
+    confirmation: str = Query(..., description="Xác nhận xóa bằng cách nhập 'TÔI HIỂU'"),
+    db: Session = Depends(get_db)
+):
+    # Node 1: Điểm vào hàm
+    # Node 2: Kiểm tra xác nhận
+    if confirmation != "TÔI HIỂU":
+        # Node 3: Xác nhận không đúng - trả về lỗi
+        raise HTTPException(
+            status_code=400, 
+            detail="Xác nhận không đúng. Vui lòng nhập 'TÔI HIỂU' để xác nhận xóa."
+        )
+    
+    # Node 4: Kiểm tra nhân viên tồn tại
+    employee = db.query(Employee).filter(Employee.manv == employee_id).first()
+    if not employee:
+        # Node 5: Nhân viên không tồn tại - trả về lỗi
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Node 6: Kiểm tra số lượng nhân viên
+    total_employees = db.query(Employee).count()
+    if total_employees <= 1:
+        # Node 7: Không thể xóa nhân viên cuối cùng - trả về lỗi
+        raise HTTPException(
+            status_code=400, 
+            detail="Không thể xóa nhân viên cuối cùng trong hệ thống."
+        )
+    
+    # Node 8: Log xóa nhân viên
+    print(f"⚠️ DELETING EMPLOYEE: {employee.manv} - {employee.tennv} - {employee.email}")
+    
+    # Node 9: Thực hiện xóa
+    db.delete(employee)
+    # Node 10: Commit giao dịch
+    db.commit()
+    # Node 11: Trả về None
+    return None
+    # Node 12: Điểm thoát hàm
+```
+
+### 8.2 Đồ thị Luồng Điều khiển
+```
+    1 (Điểm vào)
+    ↓
+    2 (if confirmation != "TÔI HIỂU")
+    ↓
+    ├─ True → 3 (return error) → 12 (Thoát)
+    └─ False → 4 (query employee)
+              ↓
+              5 (if not employee)
+              ↓
+              ├─ True → 5 (return error) → 12 (Thoát)
+              └─ False → 6 (count total)
+                        ↓
+                        7 (if total <= 1)
+                        ↓
+                        ├─ True → 7 (return error) → 12 (Thoát)
+                        └─ False → 8 (log)
+                                  ↓
+                                  9 (delete)
+                                  ↓
+                                  10 (commit)
+                                  ↓
+                                  11 (return None) → 12 (Thoát)
+```
+
+### 8.3 Tính toán Độ phức tạp Cyclomatic
+- **E (Cạnh):** 8
+- **N (Nút):** 12
+- **V(G) = E - N + 2 = 8 - 12 + 2 = -2**
+
+**Sửa lại:** Có 3 điều kiện if, mỗi điều kiện tạo 2 cạnh
+- **E (Cạnh):** 12 (3 điều kiện × 2 + 6 cạnh khác)
+- **N (Nút):** 12
+- **V(G) = E - N + 2 = 12 - 12 + 2 = 2**
+
+**Số đường kiểm thử độc lập:** 4
+
+### 8.4 Đường Kiểm thử
+1. **Đường 1:** 1 → 2 → 3 → 12 (Xác nhận không đúng)
+2. **Đường 2:** 1 → 2 → 4 → 5 → 12 (Nhân viên không tồn tại)
+3. **Đường 3:** 1 → 2 → 4 → 5 → 6 → 7 → 12 (Không thể xóa nhân viên cuối cùng)
+4. **Đường 4:** 1 → 2 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 (Xóa thành công)
+
+### 8.5 Bảng Trường hợp Kiểm thử
+
+| Đường kiểm thử | Giá trị đầu vào | Kết quả mong đợi |
+|----------------|-----------------|-------------------|
+| 1.2.3.12 | `confirmation = "SAI"` | `HTTP 400: "Xác nhận không đúng"` |
+| 1.2.4.5.12 | `employee_id = "NV999"` (không tồn tại) | `HTTP 404: "Employee not found"` |
+| 1.2.4.5.6.7.12 | `total_employees = 1` | `HTTP 400: "Không thể xóa nhân viên cuối cùng"` |
+| 1.2.4.5.6.7.8.9.10.11.12 | `confirmation = "TÔI HIỂU"`, `employee_id = "NV001"` (tồn tại), `total_employees > 1` | `HTTP 204: Xóa thành công` |
+
+### 8.6 Phân lớp Tương đương cho Chức năng Xóa
+
+#### **Phân lớp Hợp lệ:**
+- **confirmation:** `"TÔI HIỂU"` (chính xác)
+- **employee_id:** Mã nhân viên tồn tại trong hệ thống
+- **total_employees:** Số lượng nhân viên > 1
+
+#### **Phân lớp Không hợp lệ:**
+- **confirmation:** 
+  - Chuỗi rỗng `""`
+  - Chuỗi khác `"TÔI HIỂU"` (ví dụ: `"SAI"`, `"Tôi hiểu"`, `"TOI HIEU"`)
+  - Chuỗi có khoảng trắng `" TÔI HIỂU "`
+- **employee_id:**
+  - Mã nhân viên không tồn tại
+  - Mã nhân viên rỗng
+  - Mã nhân viên không đúng định dạng
+- **total_employees:**
+  - Số lượng nhân viên = 1 (nhân viên cuối cùng)
+  - Số lượng nhân viên = 0 (hệ thống trống)
+
+### 8.7 Giá trị Biên
+- **confirmation:** 
+  - Biên dưới: `""` (rỗng)
+  - Biên trên: `"TÔI HIỂU"` (chính xác)
+  - Giá trị gần biên: `"TÔI HIỂU "` (có khoảng trắng)
+- **total_employees:**
+  - Biên dưới: `1` (không thể xóa)
+  - Biên trên: `2` (có thể xóa)
+  - Giá trị gần biên: `3` (nhiều nhân viên)
+
+---
+
+## 9. Hàm Frontend: `validateField` (ngsinh)
+
+### 9.1 Phân tích Mã
+```javascript
+case 'ngsinh':
+  if (!value) {
+    return 'Ngày sinh không được để trống';
+  }
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(value)) {
+    return 'Ngày sinh phải theo định dạng YYYY-MM-DD';
+  }
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    return 'Ngày sinh không hợp lệ';
+  }
+  const today = new Date();
+  if (date > today) {
+    return 'Ngày sinh không được trong tương lai';
+  }
+  return '';
+```
+
+### 9.2 Đồ thị Luồng Điều khiển
+```
+    1 (Switch case)
+    ↓
+    2 (if !value)
+    ↓
+    ├─ True → return error → 8 (Thoát)
+    └─ False → 3 (if !regex.test())
+              ↓
+              ├─ True → return error → 8 (Thoát)
+              └─ False → 4 (new Date())
+                        ↓
+                        5 (if isNaN())
+                        ↓
+                        ├─ True → return error → 8 (Thoát)
+                        └─ False → 6 (if > today)
+                                  ↓
+                                  ├─ True → return error → 8 (Thoát)
+                                  └─ False → 7 (thành công) → 8 (Thoát)
+```
+
+### 9.3 Tính toán Độ phức tạp Cyclomatic
+- **E (Cạnh):** 10
+- **N (Nút):** 8
+- **V(G) = E - N + 2 = 10 - 8 + 2 = 4**
+
+**Số đường kiểm thử độc lập:** 4
+
+### 9.4 Đường Kiểm thử
+1. **Đường 1:** 1 → 2 → return error → 8 (Ngày rỗng)
+2. **Đường 2:** 1 → 2 → 3 → return error → 8 (Định dạng không hợp lệ)
+3. **Đường 3:** 1 → 2 → 3 → 4 → 5 → return error → 8 (Ngày không hợp lệ)
+4. **Đường 4:** 1 → 2 → 3 → 4 → 5 → 6 → return error → 8 (Ngày tương lai)
+5. **Đường 5:** 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 (Ngày hợp lệ)
+
+### 9.5 Bảng Trường hợp Kiểm thử
+
+| Đường kiểm thử | Giá trị đầu vào | Kết quả mong đợi |
+|----------------|-----------------|-------------------|
+| 1.2.error.8 | `""` | `"Ngày sinh không được để trống"` |
+| 1.2.3.error.8 | `"2023/12/31"` | `"Ngày sinh phải theo định dạng YYYY-MM-DD"` |
+| 1.2.3.4.5.error.8 | `"2023-13-45"` | `"Ngày sinh không hợp lệ"` |
+| 1.2.3.4.5.6.error.8 | `"2025-01-01"` | `"Ngày sinh không được trong tương lai"` |
+| 1.2.3.4.5.6.7.8 | `"1990-01-01"` | `""` (thành công) |
+
+---
+
+## 10. Tổng kết Coverage
+
+### 10.1 Hàm Backend
 - **generate_employee_id:** 3 đường, 3 trường hợp kiểm thử
 - **create_employee:** 2 đường, 2 trường hợp kiểm thử
+- **delete_employee:** 4 đường, 4 trường hợp kiểm thử
 - **validate_email_domain:** 9 đường, 9 trường hợp kiểm thử ⭐ **PHỨC TẠP NHẤT**
 - **validate_tennv:** 3 đường, 3 trường hợp kiểm thử
 - **validate_sdt:** 2 đường, 2 trường hợp kiểm thử
 - **validate_ngsinh:** 4 đường, 4 trường hợp kiểm thử
 
-### 9.2 Hàm Frontend
+### 10.2 Hàm Frontend
 - **validateField (tennv):** 4 đường, 4 trường hợp kiểm thử
 - **validateField (ngsinh):** 5 đường, 5 trường hợp kiểm thử
 
-### 9.3 Tổng cộng
-- **Tổng Trường hợp Kiểm thử:** 33
+### 10.3 Tổng cộng
+- **Tổng Trường hợp Kiểm thử:** 37
 - **Branch Coverage:** 100%
 - **Statement Coverage:** 100%
 - **Path Coverage:** 100%
 
-### 9.4 Các trường bắt buộc đã kiểm thử:
+### 10.4 Các trường bắt buộc đã kiểm thử:
 - ✅ **tennv** (Họ tên)
 - ✅ **sdt** (Số điện thoại)
 - ✅ **ngsinh** (Ngày sinh)
 - ✅ **email** (Email - kiểm tra trùng lặp + xác thực phức tạp) ⭐
 - ✅ **Logic tạo nhân viên** (create_employee)
 
-### 9.5 Các trường có thể bỏ trống:
+### 10.5 Các trường có thể bỏ trống:
 - **dchithuongtru** (Địa chỉ thường trú)
 - **noidkhktt** (Nơi đăng ký HKTT)
 - **trinhdo** (Trình độ)
@@ -605,15 +807,15 @@ return '';
 
 ---
 
-## 10. Cách chạy Test
+## 11. Cách chạy Test
 
-### 10.1 Backend Test
+### 11.1 Backend Test
 ```bash
 cd backend
 python simple_test.py
 ```
 
-### 10.2 Frontend Test
+### 11.2 Frontend Test
 ```bash
 cd frontend
 node simple_test.js
