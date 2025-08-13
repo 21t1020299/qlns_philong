@@ -239,7 +239,18 @@ const EmployeeList: React.FC = () => {
 
     try {
       await employeeAPI.deleteEmployee(deleteTarget.id, confirmation);
-      setSuccess(`✅ Xóa nhân viên ${deleteTarget.id} - ${deleteTarget.name} thành công!`);
+      
+      // Show success modal
+      setSuccessInfo({
+        title: '🗑️ Xóa nhân viên thành công!',
+        message: `Nhân viên ${deleteTarget.id} - ${deleteTarget.name} đã được xóa khỏi hệ thống.`,
+        employeeInfo: {
+          id: deleteTarget.id,
+          name: deleteTarget.name,
+          email: 'Đã xóa'
+        }
+      });
+      setShowSuccessModal(true);
       
       // Check if current page will be empty after deletion
       if (employees.length === 1 && currentPage > 1) {
@@ -250,7 +261,7 @@ const EmployeeList: React.FC = () => {
       await loadEmployees();
       await loadStats();
       
-      // Close modal
+      // Close delete modal
       setShowDeleteModal(false);
       setDeleteTarget(null);
     } catch (err) {
